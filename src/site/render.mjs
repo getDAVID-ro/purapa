@@ -746,6 +746,7 @@ function footer(ctx) {
           <li>${ctx.text('{program}')}</li><li>${ctx.text('{adresa}')}</li></ul></div>
         <nav aria-labelledby="f-legal"><h2 id="f-legal">Legal</h2><ul>${links('legal')}</ul></nav>
       </div>
+      <div class="ft-anpc"><a href="https://reclamatiisal.anpc.ro/" target="_blank" rel="noopener"><img src="/assets/anpc-sal.png" alt="ANPC: Soluționarea alternativă a litigiilor (se deschide într-o fereastră nouă)" width="201" height="50" loading="lazy"></a></div>
       <div class="legal"><span>${esc(f.brand)} este o marcă ${esc(f.legal_name)}</span><span>CUI ${esc(f.cui)} · ${esc(f.reg_com)}</span></div>
     </div></footer>`);
   });
