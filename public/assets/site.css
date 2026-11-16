@@ -352,6 +352,11 @@ em.accent { font-style: normal; color: var(--blue); background: linear-gradient(
 .socials a:hover { background: var(--blue); border-color: var(--blue); color: var(--white); }
 .socials svg { width: 18px; height: 18px; }
 .legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .8125rem; }
+/* Pictograma SAL a ANPC (fișierul oficial), cu link spre platforma de reclamații SAL, ca la Nixodor. */
+.ft-anpc { margin-top: 2.5rem; }
+.ft-anpc a { display: inline-block; border-radius: 8px; }
+.ft-anpc img { display: block; width: 201px; height: 50px; }
+.ft-anpc + .legal { margin-top: 1.75rem; }
 @media (max-width: 880px) { .site-footer .cols { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .site-footer .cols { grid-template-columns: 1fr; } }
 
