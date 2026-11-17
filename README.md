@@ -117,7 +117,10 @@ Constatările importului ajung în **Panou → De făcut**. Pe 26.10.2026 au fos
 | Entități | lista pe tipuri, lista cu „Apare în”; taburile Prezentare (impact, observații, mini-hartă), Detalii (formular din registru, ciornă / publicare, 409 la versiune veche, `?camp=`), Relații (din ambele capete, ordine, confirmare, 🔒 pe relațiile sensibile), Surse (cu confirmare), Unde apare (4 niveluri + „apare după publicare”), Istoric |
 | Harta | tipuri pe categorii (√n, hover, perechi posibile) → membri (cei mai conectați primii, câte 40) → entitate (intrări / ieșiri, stări, pagini); traseu, sănătate, „Toate legăturile”, panoul relației, straturi, filtre, „Drumul tău” |
 | Legături de verificat | grupate pe relație și dovadă, cu recomandare și încredere; confirmare sau scoatere în masă într-o tranzacție, cu un singur eveniment; respingerile se țin minte |
+| Teste apă | ce trimit vizitatorii prin formularul /test-rapid/: contactul, acordurile, fotografia benzii (JPEG micșorat la 1600 px în browser) și rezultatul analizei, interpretat cu pragurile de pe site; stare (nou, contactat, închis) și ștergere definitivă (GDPR) |
 | Surse, Utilizatori | sursele cu certitudinea lor; conturi cu roluri (admin, editor, viewer) |
+
+**Teste apă** (`src/core/watertests.mjs`): formularul trimite contactul și fotografia la `POST /api/teste` în paralel cu analiza de la serviciul extern, apoi rezultatul la `POST /api/teste/<id>`, cu cheia primită (o singură dată, în prima oră). Datele stau în Neon, în tabelul `water_tests`, nu în baza panoului, ca un vizitator să nu rescrie baza editorilor. Limite: 6 teste pe oră de la aceeași adresă IP (ținută doar ca hash), 400 pe zi, fotografie de cel mult 3 MB, verificată după conținut; cererile din alte site-uri sunt refuzate. Panoul local le citește tot din Neon, deci are nevoie de `DATABASE_URL` în `.env.local`.
 
 **Autentificare:** parole scrypt; tokenul de sesiune e stocat doar ca hash; cookie `HttpOnly`, `SameSite=Lax` (`Secure` în spatele HTTPS); 5 încercări greșite în 15 minute dau 429. Scrierile din alt site sunt refuzate, iar dreptul se verifică pe server, la fiecare cerere.
 
