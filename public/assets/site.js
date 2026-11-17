@@ -404,14 +404,36 @@ document.querySelectorAll('[data-testrapid]').forEach(root => {
     show(3);
   };
 
+  // Copia pentru Purapa (panoul, „Teste apă”): contactul și fotografia micșorată (JPEG, cel mult 1600 px) pleacă la /api/teste
+  // în paralel cu analiza; rezultatul vine după, cu cheia primită. Dacă salvarea nu merge, analiza continuă oricum.
+  const asJpeg = async file => {
+    try {
+      const bmp = await createImageBitmap(file);
+      const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+      const cv = document.createElement('canvas'); cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+      cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
+      return cv.toDataURL('image/jpeg', .85);
+    } catch {
+      return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+    }
+  };
+  const post = (url, body) => fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body), keepalive: url !== '/api/teste'})
+    .then(r => r.ok ? r.json() : null).catch(() => null);
+  const keep = (file, analysisPath) => asJpeg(file).then(image => post('/api/teste', {...lead(), note: (optional.querySelector('input').value || '').trim(),
+    gdpr: form.elements.gdpr.checked, consentContact: form.elements.consentContact.checked, image, analysisPath})).catch(() => null);
+  const report = (saved, outcome, extra = {}) => saved.then(t => t?.id && post(`/api/teste/${t.id}`, {token: t.token, outcome, ...extra}));
+
   send.addEventListener('click', async () => {
     if (!photo) return;
     fail('');
+    let saved = Promise.resolve(null), reported = false;
+    const finish = (outcome, extra) => { reported = true; report(saved, outcome, extra); };
     const msg = $('[data-msg]');
     busy.hidden = false; busy.classList.remove('analyzing'); msg.textContent = 'Se încarcă fotografia...';
     const auth = {apikey: api.key, Authorization: `Bearer ${api.key}`};
     try {
       const path = `inputs/${crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`}.jpg`;
+      saved = keep(photo, path);
       const body = new FormData();
       body.append('cacheControl', '3600');
       body.append('', photo);
@@ -424,13 +446,16 @@ document.querySelectorAll('[data-testrapid]').forEach(root => {
       if (!(r.headers.get('content-type') ?? '').includes('application/json')) throw new Error('Eroare de server. Încearcă din nou peste câteva momente.');
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || 'A apărut o eroare la analiză. Încearcă din nou.');
-      if (data.pendingRetry) { clear(); show('pending'); return; }
+      if (data.pendingRetry) { finish('asteptare'); clear(); show('pending'); return; }
       if (data.imageQualityIssue) {
+        finish('calitate', {error: typeof data.error === 'string' ? data.error : ''});
         clear();
         throw new Error(typeof data.error === 'string' && data.error ? data.error : 'Nu am putut analiza fotografia. Încearcă din nou cu o imagine mai clară:\n• banda trebuie să fie vizibilă și în focus;\n• fotografia, făcută în lumină bună;\n• toți cei 16 indicatori, vizibili;\n• banda, paralelă cu scala de culori.');
       }
+      finish('analizat', {result: data});
       result(data);
     } catch (e) {
+      if (!reported) finish('eroare', {error: e.message});
       fail(e instanceof TypeError ? 'Nu s-a putut trimite fotografia. Verifică conexiunea și încearcă din nou.' : e.message);
     } finally {
       busy.hidden = true;
