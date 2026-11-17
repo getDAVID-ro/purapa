@@ -9,9 +9,11 @@ npm run import -- --offline   # din snapshot-ul existent, fără rețea
 npm start                  # site: http://localhost:3100/ · panou: http://localhost:3100/manage/ · publică singur site-ul (vezi mai jos)
 npm test                   # 36 de teste: propagare (§5), /manage, import
 npm run build:public       # regenerează site-ul static în public/ (de obicei nu e nevoie: npm start o face)
-npm run blob:sync          # o sincronizare a bazei panoului online acum, cu serverul oprit (de obicei nu e nevoie)
-npm run blob:upload -- --force    # doar în situații speciale: baza locală peste cea online
-npm run blob:download -- --force  # doar în situații speciale: baza online peste cea locală (cea locală rămâne în data/backup/)
+npm run setup              # calculator nou: aduce baza din Neon și imaginile din Blob
+npm run db:sync            # o sincronizare a bazei panoului online acum, cu serverul oprit (de obicei nu e nevoie)
+npm run db:upload -- --force    # doar în situații speciale: baza locală peste cea online
+npm run db:download -- --force  # doar în situații speciale: baza online peste cea locală (cea locală rămâne în data/backup/)
+npm run transfer:pack      # transferul la alt proprietar: vezi TRANSFER.md
 npm run deploy             # publicare manuală pe Vercel (de obicei nu e nevoie: fiecare push pe main publică singur)
 npm run export             # varianta statică în dist/ (fără panou); npm run deploy:static o publică
 ```
@@ -22,13 +24,14 @@ La prima pornire nu există conturi: panoul e deschis fără parolă **doar de p
 
 Site-ul e pe **https://purapa-six.vercel.app**, iar panoul online la [`/manage/`](https://purapa-six.vercel.app/manage/).
 
-- **Site-ul public e static:** paginile, resursele, imaginile folosite și `robots.txt` stau în `public/`, generate din Brain (`src/site/static.mjs`). Vercel le servește direct, fără funcție și fără Blob, deci vizitatorii nu consumă nimic din cota de stocare. Formularul de contact e un link de email.
+- **Site-ul public e static:** paginile, resursele, imaginile folosite și `robots.txt` stau în `public/`, generate din Brain (`src/site/static.mjs`). Vercel le servește direct, fără funcție, fără Neon și fără Blob. Formularul de contact e un link de email.
 - **Funcția** (`api/index.mjs`) primește doar `/manage`, `/api` și adresele care nu există (301 spre bara finală sau 404).
-- **Baza panoului online** (`purapa.db`) stă într-un **Blob privat** (`purapa-brain`, Frankfurt). Funcția o citește doar pentru `/manage` și `/api`, cel mult o dată la 30 de secunde pe instanță. După o salvare, baza se urcă înapoi condiționat: dacă între timp a salvat altcineva, panoul primește „Reîncarcă și salvează din nou”.
+- **Baza panoului online** (`purapa.db`) stă în **Neon** (`purapa-db`, Frankfurt, plan gratuit), ca un singur rând: fișierul comprimat plus o versiune (`src/core/remote.mjs`). Funcția verifică versiunea doar pentru `/manage` și `/api`, cel mult o dată la 30 de secunde pe instanță. După o salvare, baza se urcă înapoi condiționat: dacă între timp a salvat altcineva, panoul primește „Reîncarcă și salvează din nou”.
+- **Imaginile** din `data/media` se păstrează și în **Blob** (privat, `media/<nume>`), ca proiectul să poată fi refăcut pe alt calculator (`npm run setup`). Lista lor stă în Neon, deci Blob-ul nu e listat și se scrie doar când apare o imagine nouă (`src/core/mediasync.mjs`).
 
-**Panoul e deschis oricui, fără parolă:** variabila de mediu `MANAGE_OPEN=1` din Vercel, cerută explicit. Ca să-l închizi, șterge `MANAGE_OPEN` din Vercel (Settings → Environment Variables) și redeployează. Atunci panoul cere login, iar contul de administrator se creează local și se urcă cu baza (`npm run blob:upload`).
+**Panoul e deschis oricui, fără parolă:** variabila de mediu `MANAGE_OPEN=1` din Vercel, cerută explicit. Ca să-l închizi, șterge `MANAGE_OPEN` din Vercel (Settings → Environment Variables) și redeployează. Atunci panoul cere login, iar contul de administrator se creează local și se urcă cu baza (singur, la sincronizare).
 
-**Cota gratuită Blob (Hobby):** 10.000 de operații simple și 2.000 avansate pe lună. Peste ea, store-ul e blocat 30 de zile. Pe 28.10.2026 a fost blocat: sincronizarea verifica Blob-ul la fiecare 5 secunde, iar funcția îl citea la fiecare vizită. De aceea site-ul public nu mai depinde de Blob, iar panoul online e indisponibil până la deblocare (aproximativ 27.11.2026).
+**Cota gratuită Blob (Hobby):** 10.000 de operații simple și 2.000 avansate pe lună. Peste ea, store-ul e blocat 30 de zile. Pe 28.10.2026 a fost blocat (până pe aproximativ 27.11.2026): sincronizarea verifica Blob-ul la fiecare 5 secunde, iar funcția îl citea la fiecare vizită. De aceea site-ul public nu depinde de nicio stocare, baza panoului s-a mutat în Neon (17.11.2026), iar Blob-ul ține doar imagini. Cât timp e blocat, imaginile noi se urcă mai târziu, singure.
 
 ## Fluxul de lucru: totul automat
 
@@ -36,13 +39,15 @@ Lucrezi local (conținut, cod, design), iar restul se face singur:
 
 - **Codul și designul** se comit și se urcă pe GitHub (`toma776/purapa`) după fiecare modificare. Vercel publică automat fiecare push pe `main`.
 - **Conținutul:** cât rulează `npm start`, orice schimbare din panoul local regenerează paginile din `public/`. După 15 secunde fără alte schimbări, serverul le comite („Conținut publicat din panou”) și le urcă pe GitHub, iar Vercel le publică în aproximativ 40 de secunde (`src/core/publisher.mjs`). Un push eșuat se reîncearcă singur; `PUBLISH=0` oprește publicarea.
-- **Panoul online** se sincronizează cu baza locală la 15 minute (`SYNC_SECONDS`):
+- **Panoul online** se sincronizează cu baza locală prin Neon, la 15 minute (`SYNC_SECONDS`):
   - ce modifici local ajunge în panoul online;
   - ce s-a schimbat în panoul online vine local și se publică pe site.
 
-  Dacă baza s-a modificat în ambele locuri, rămâne varianta locală, iar cea online se salvează în `data/backup/`. Cât timp store-ul e blocat, serverul reîncearcă o dată pe oră și afișează un singur mesaj.
+  Dacă baza s-a modificat în ambele locuri, rămâne varianta locală, iar cea online se salvează în `data/backup/`. Cât timp Blob-ul e blocat, imaginile se reîncearcă o dată pe oră, cu un singur mesaj.
 
-Cheia Blob vine local cu `npx vercel env pull .env.local` (fișierul nu intră în git). Fără ea, baza rămâne doar locală, iar site-ul se publică oricum.
+Cheile (`DATABASE_URL` pentru Neon, `BLOB_READ_WRITE_TOKEN`) vin local cu `npx vercel env pull .env.local` (fișierul nu intră în git). Fără ele, baza rămâne doar locală, iar site-ul se publică oricum.
+
+**Transferul** la alt proprietar (GitHub, Vercel, Neon, Blob) e descris în [TRANSFER.md](TRANSFER.md).
 
 **Indexarea e oprită.** Cât timp purapa.ro e încă site-ul vechi, site-ul nou nu trebuie să apară în Google și nici să concureze cu el:
 

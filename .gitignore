@@ -19,3 +19,5 @@ node_modules/
 
 # Documentele de lucru pentru blog (Word): rămân pe calculator, nu în repo-ul public.
 /Blog/
+
+.env*

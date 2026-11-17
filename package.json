@@ -16,13 +16,18 @@
     "export": "node scripts/export.mjs",
     "deploy": "npm run build:public && npx vercel deploy --prod --yes",
     "build:public": "node scripts/build-public.mjs",
-    "blob:upload": "node scripts/blob.mjs upload",
-    "blob:download": "node scripts/blob.mjs download",
     "deploy:static": "node scripts/export.mjs && npx vercel deploy dist --prod --yes",
-    "blob:sync": "node scripts/blob.mjs sync",
-    "bake:images": "node scripts/bake-images.mjs"
+    "bake:images": "node scripts/bake-images.mjs",
+    "setup": "node scripts/db.mjs setup",
+    "db:sync": "node scripts/db.mjs sync",
+    "db:upload": "node scripts/db.mjs upload",
+    "db:download": "node scripts/db.mjs download",
+    "media:upload": "node scripts/db.mjs media:upload",
+    "transfer:pack": "node scripts/transfer.mjs pack",
+    "transfer:setup": "node scripts/transfer.mjs setup"
   },
   "dependencies": {
+    "@neondatabase/serverless": "1.2.0",
     "@vercel/blob": "^2.8.2"
   }
 }
