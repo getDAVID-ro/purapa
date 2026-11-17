@@ -339,6 +339,8 @@ em.accent { font-style: normal; color: var(--blue); background: linear-gradient(
 .form input::placeholder, .form textarea::placeholder { color: #6b7487; font-weight: 400; opacity: 1; }
 .form input:focus, .form textarea:focus { border-color: var(--blue); outline: 3px solid rgb(37 74 153 / .2); outline-offset: 0; }
 .form textarea { min-height: 9rem; resize: vertical; }
+/* Câmpul-capcană pentru roboți: scos din ecran, vizitatorii nu îl văd și nu ajung la el. */
+.form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-note { margin: 0; padding: .75rem 1rem; border-radius: var(--r-sm); background: #e3f5ec; color: var(--ok); font-size: .9375rem; font-weight: 600; }
 @media (max-width: 880px) { .contact-grid { grid-template-columns: 1fr; } }
 

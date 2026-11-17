@@ -2,7 +2,7 @@
 import {can, HttpError} from '../core/store.mjs';
 import {inferredCount} from '../core/inferred.mjs';
 import {dashboard} from './views/dashboard.mjs';
-import {entitiesIndex, entityList, entityNew, entityView} from './views/entities.mjs';
+import {entitiesIndex, entityList, entityNew, entityView, leads} from './views/entities.mjs';
 import {inferred, sources, map} from './views/review.mjs';
 import {users} from './views/users.mjs';
 import {byKey} from '../registry/entities.mjs';
@@ -11,11 +11,13 @@ export function renderManage(env, path, user) {
   const ctx = {...env, user, counts: {
     failed: env.db.prepare("SELECT COUNT(*) n FROM change_events WHERE status = 'failed'").get().n,
     inferred: inferredCount(env.db),
+    leads: env.db.prepare('SELECT COUNT(*) n FROM messages WHERE created_at >= ?').get(new Date(Date.now() - 7 * 864e5).toISOString()).n,
     syncConflict: env.syncStatus?.() ?? null
   }};
   if (!can(user, 'content.read')) throw new HttpError(403, 'Lipsește dreptul content.read');
   let m;
   if (path === '/manage/') return dashboard(ctx);
+  if (path === '/manage/leads/') return leads(ctx);
   if (path === '/manage/entitati/') return entitiesIndex(ctx);
   if ((m = /^\/manage\/entitati\/([a-z-]+)\/$/.exec(path)) && byKey[m[1]]) return entityList(ctx, m[1]);
   if ((m = /^\/manage\/entitati\/([a-z-]+)\/nou\/$/.exec(path)) && byKey[m[1]]) return entityNew(ctx, m[1]);

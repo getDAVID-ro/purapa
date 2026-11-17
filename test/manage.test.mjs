@@ -153,3 +153,39 @@ test('/manage prin HTTP: login, pagini, refuzuri', async t => {
   assert.ok(Array.isArray(saved.observations));
   assert.equal((await go(`/api/manage/entities/produse/${kit.id}`, {cookie: ed, method: 'PUT', body: {data: {price: 1}, publish: true, version: kit.version}})).status, 409);
 });
+
+test('leads: formularul de contact scrie în Brain, iar panoul le arată la /manage/leads/', async t => {
+  const app = createApp({file: ':memory:'});
+  seed(app.store);
+  app.auth.createUser({email: 'admin@test.ro', name: 'Admin', role: 'admin', password: 'parola-admin-1'});
+  const srv = http.createServer(app.handle).listen(0);
+  await new Promise(r => srv.on('listening', r));
+  t.after(() => srv.close());
+  const base = `http://127.0.0.1:${srv.address().port}`;
+  const post = (body, headers = {'content-type': 'application/json'}) => fetch(`${base}/api/public/contact`, {method: 'POST', redirect: 'manual', headers,
+    body: headers['content-type'].includes('json') ? JSON.stringify(body) : new URLSearchParams(body)});
+  const lead = {name: 'Ioana Pop', email: 'ioana@test.ro', phone: '0722 123 456', subject: 'Filtru pentru apartament', message: 'Aș vrea să știu ce filtru se potrivește la bloc.'};
+
+  assert.deepEqual(await (await post(lead)).json(), {ok: true});
+  const [row] = app.store.list('cereri');
+  assert.equal(row.email, 'ioana@test.ro');
+  assert.equal(row.source, 'Formular de contact');
+
+  // Fără JavaScript: formular clasic, întors pe pagina de contact.
+  const plain = await post({...lead, email: 'fara-js@test.ro'}, {'content-type': 'application/x-www-form-urlencoded'});
+  assert.equal(plain.status, 303);
+  assert.equal(plain.headers.get('location'), '/contact/?trimis=1');
+
+  // Câmpul-capcană completat (robot): răspuns ca de succes, dar nimic salvat. Mesaj prea scurt: refuzat.
+  assert.equal((await post({...lead, website: 'http://spam.example'})).status, 200);
+  assert.equal((await post({...lead, message: 'scurt'})).status, 400);
+  assert.equal(app.store.list('cereri').length, 2);
+
+  const cookie = (await fetch(`${base}/api/manage/auth/login`, {method: 'POST', headers: {'content-type': 'application/json'},
+    body: JSON.stringify({email: 'admin@test.ro', password: 'parola-admin-1'})})).headers.get('set-cookie').split(';')[0];
+  const html = await (await fetch(`${base}/manage/leads/`, {headers: {cookie}})).text();
+  assert.match(html, /Ioana Pop/);
+  assert.match(html, /mailto:ioana@test\.ro/);
+  assert.match(html, /Filtru pentru apartament/);
+  assert.match(html, /Formular de contact/);
+});

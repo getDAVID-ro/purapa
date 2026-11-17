@@ -21,6 +21,7 @@ export const impact = i => `<span class="badge ${i === 'mare' ? 'bad' : i === 'm
 
 const NAV = [
   ['panou', '/manage/', 'Panou', 'content.read'],
+  ['leads', '/manage/leads/', 'Leads', 'content.read'],
   ['entitati', '/manage/entitati/', 'Entități', 'content.read'],
   ['harta', '/manage/harta/', 'Harta', 'content.read'],
   ['legaturi', '/manage/surse/legaturi/', 'Legături de verificat', 'content.read'],
@@ -30,8 +31,8 @@ const NAV = [
 
 export function page(user, {title, active, crumbs = [], body, counts = {}, scripts = []}) {
   const nav = NAV.filter(([, , , perm]) => can(user, perm)).map(([key, href, label]) => {
-    const n = key === 'legaturi' ? counts.inferred : key === 'panou' ? counts.failed : 0;
-    return `<a href="${href}"${key === active ? ' aria-current="page"' : ''}>${esc(label)}${n ? ` <span class="count${key === 'panou' ? ' bad' : ''}" title="${key === 'panou' ? 'propagări eșuate' : 'de verificat'}">${n}</span>` : ''}</a>`;
+    const n = key === 'legaturi' ? counts.inferred : key === 'panou' ? counts.failed : key === 'leads' ? counts.leads : 0;
+    return `<a href="${href}"${key === active ? ' aria-current="page"' : ''}>${esc(label)}${n ? ` <span class="count${key === 'panou' ? ' bad' : ''}" title="${key === 'panou' ? 'propagări eșuate' : key === 'leads' ? 'primite în ultimele 7 zile' : 'de verificat'}">${n}</span>` : ''}</a>`;
   }).join('');
   const trail = crumbs.length ? `<nav class="crumbs" aria-label="Fir de navigare">${crumbs.map(([label, href]) =>
     href ? `<a href="${href}">${esc(label)}</a>` : `<span>${esc(label)}</span>`).join('<span aria-hidden="true">›</span>')}</nav>` : '';

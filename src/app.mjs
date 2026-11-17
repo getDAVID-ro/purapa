@@ -41,8 +41,9 @@ export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cro
   const ipOf = req => String(req.headers['x-forwarded-for'] ?? req.socket.remoteAddress ?? '').split(',')[0].trim();
 
   async function readBody(req) {
-    let raw = '';
-    for await (const chunk of req) { raw += chunk; if (raw.length > 1e6) throw new HttpError(413, 'Cerere prea mare'); }
+    // Pe Vercel, corpul cererilor publice e citit dinainte (api/index.mjs), ca cererea să poată fi reluată la un conflict.
+    let raw = req.rawBody ?? '';
+    if (req.rawBody == null) for await (const chunk of req) { raw += chunk; if (raw.length > 1e6) throw new HttpError(413, 'Cerere prea mare'); }
     if (!raw) return {};
     if ((req.headers['content-type'] ?? '').includes('application/x-www-form-urlencoded')) return Object.fromEntries(new URLSearchParams(raw));
     try { return JSON.parse(raw); } catch { throw new HttpError(400, 'JSON invalid'); }
@@ -130,11 +131,18 @@ export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cro
         return send(res, 200, renderManage(env, path, user), 'text/html; charset=utf-8', headers);
       }
 
+      // Formularul de contact: mesajul devine un lead în Brain (/manage/leads/). Site-ul îl trimite ca JSON; fără JavaScript,
+      // browserul îl trimite ca formular și e întors pe pagina de contact. Câmpul ascuns „website” îl completează doar roboții.
       if (path === '/api/public/contact' && req.method === 'POST') {
         const b = await readBody(req);
-        if (String(b.message ?? '').length < 20) throw new HttpError(400, 'Mesajul trebuie să aibă cel puțin 20 de caractere');
-        store.create({...SYSTEM, name: 'Formular site'}, 'cereri', {name: b.name, email: b.email, phone: b.phone, subject: b.subject, message: b.message});
-        return send(res, 303, '', 'text/plain', {location: '/contact/?trimis=1'});
+        const done = () => (req.headers['content-type'] ?? '').includes('application/json') ? send(res, 200, {ok: true})
+          : send(res, 303, '', 'text/plain', {location: '/contact/?trimis=1'});
+        if (b.website) return done();
+        const t = (v, max) => String(v ?? '').trim().slice(0, max);
+        if (t(b.message, 5000).length < 20) throw new HttpError(400, 'Mesajul trebuie să aibă cel puțin 20 de caractere');
+        store.create({...SYSTEM, name: 'Formular site'}, 'cereri', {name: t(b.name, 120), email: t(b.email, 200), phone: t(b.phone, 40),
+          subject: t(b.subject, 200), message: t(b.message, 5000), source: 'Formular de contact'});
+        return done();
       }
 
       // Înscrierea în Purapa Ambassadors (doar pe serverul local; pe site-ul static pleacă prin email): devine un mesaj în Brain.
@@ -145,7 +153,7 @@ export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cro
         const message = [`Oraș: ${b.city ?? ''}`, `Profil: ${b.profile ?? ''}`, `Unde ar recomanda: ${list(b.channels) || '—'}`,
           `Profil online: ${b.link || '—'}`, '', b.motivation || '(fără mesaj)'].join('\n');
         store.create({...SYSTEM, name: 'Formular ambasadori'}, 'cereri', {name: b.name, email: b.email, phone: b.phone,
-          subject: 'Înscriere Purapa Ambassadors', message});
+          subject: 'Înscriere Purapa Ambassadors', message, source: 'Formular ambasadori'});
         if ((req.headers['content-type'] ?? '').includes('application/json')) return send(res, 200, {ok: true});
         return send(res, 303, '', 'text/plain', {location: '/devino-ambasador/?trimis=1#inscriere'});
       }

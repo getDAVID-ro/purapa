@@ -76,24 +76,40 @@ export default async function purapa(req, res) {
   if (!writes) return app.handle(req, res);
 
   // La scrieri, răspunsul (antetele și corpul) pleacă abia după ce baza a ajuns în Neon.
+  // Formularele publice (un lead nu are voie să se piardă) se reiau de câteva ori dacă între timp a scris altcineva:
+  // corpul cererii e citit o singură dată, aici, iar baza se reîncarcă înaintea fiecărei reluări.
+  const isPublic = path.startsWith('/api/public/');
+  if (isPublic) {
+    let raw = '';
+    for await (const chunk of req) { raw += chunk; if (raw.length > 1e6) break; }
+    req.rawBody = raw;
+  }
   const writeHead = res.writeHead.bind(res), end = res.end.bind(res);
-  let head = null, finish;
-  const ended = new Promise(r => { finish = r; });
-  res.writeHead = (...args) => { head = args; return res; };
-  res.end = (...args) => { finish(args); return res; };
-  await app.handle(req, res);
-  const body = await ended;
-  res.writeHead = writeHead; res.end = end;
-  try {
-    app.sync.process();
-    await persist();
-  } catch (e) {
-    console.error(e);
-    version = null; // la următoarea cerere se reîncarcă versiunea din Neon
-    const conflict = e instanceof ConflictError;
-    for (const h of res.getHeaderNames()) res.removeHeader(h);
-    res.writeHead(conflict ? 409 : 500, {'content-type': 'application/json; charset=utf-8'});
-    return res.end(JSON.stringify({error: conflict ? 'Între timp a salvat altcineva. Reîncarcă pagina și salvează din nou.' : 'Salvarea nu a ajuns în baza online.'}));
+  let head, body;
+  for (let attempt = 0; ; attempt++) {
+    let finish;
+    const ended = new Promise(r => { finish = r; });
+    head = null;
+    res.writeHead = (...args) => { head = args; return res; };
+    res.end = (...args) => { finish(args); return res; };
+    await app.handle(req, res);
+    body = await ended;
+    res.writeHead = writeHead; res.end = end;
+    try {
+      app.sync.process();
+      await persist();
+      break;
+    } catch (e) {
+      console.error(e);
+      version = null; // la următoarea cerere se reîncarcă versiunea din Neon
+      const conflict = e instanceof ConflictError;
+      if (conflict && isPublic && attempt < 3) {
+        try { await load(); checkedAt = Date.now(); continue; } catch (e2) { console.error(e2); return unavailable(res); }
+      }
+      for (const h of res.getHeaderNames()) res.removeHeader(h);
+      res.writeHead(conflict ? 409 : 500, {'content-type': 'application/json; charset=utf-8'});
+      return res.end(JSON.stringify({error: conflict ? 'Între timp a salvat altcineva. Reîncarcă pagina și salvează din nou.' : 'Salvarea nu a ajuns în baza online.'}));
+    }
   }
   if (head) res.writeHead(...head);
   return res.end(...body);

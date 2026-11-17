@@ -2,7 +2,8 @@
 // Rulează în serverul local, la 15 minute:
 //   - baza locală s-a schimbat (amprenta fișierului) → se urcă, condiționat de versiunea online cunoscută;
 //   - online s-a schimbat, iar local nu → se descarcă și serverul local o redeschide;
-//   - s-au schimbat amândouă → câștigă cea locală (aici se lucrează), iar cea online se păstrează în data/backup/.
+//   - s-au schimbat amândouă → câștigă cea locală (aici se lucrează), iar cea online se păstrează în data/backup/;
+//     lead-urile primite online între timp (tabelul messages) se copiază întâi în baza locală, ca să nu se piardă.
 // Starea ultimei sincronizări (versiunea online și amprenta locală) stă în data/.db-sync.json.
 import {readFileSync, writeFileSync, existsSync, mkdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
@@ -10,7 +11,7 @@ import {createRemote, ConflictError, DB_NAME, sha} from './remote.mjs';
 
 const stamp = () => new Date().toISOString().replace(/[:.]/g, '-');
 
-export function createDbSync({file = 'data/purapa.db', record = 'data/.db-sync.json', remote = createRemote(), checkpoint, reopen, log = console.log} = {}) {
+export function createDbSync({file = 'data/purapa.db', record = 'data/.db-sync.json', remote = createRemote(), checkpoint, reopen, log = console.log, keep = ['messages']} = {}) {
   const readRecord = () => existsSync(record) ? JSON.parse(readFileSync(record, 'utf8')) : {version: null, sha: null};
   const writeRecord = r => writeFileSync(record, JSON.stringify({...r, at: new Date().toISOString()}, null, 2));
   let rec = readRecord(), running = false, conflict = null;
@@ -23,13 +24,32 @@ export function createDbSync({file = 'data/purapa.db', record = 'data/.db-sync.j
     db.close();
   };
 
+  // Rândurile din tabelele `keep` care există doar în copia online (după data creării și email) se adaugă în baza locală.
+  function mergeRows(saved) {
+    const db = new DatabaseSync(file);
+    let n = 0;
+    try {
+      db.exec(`ATTACH DATABASE '${saved.replace(/'/g, "''")}' AS online`);
+      for (const t of keep) {
+        try {
+          const theirs = new Set(db.prepare(`PRAGMA online.table_info("${t}")`).all().map(c => c.name));
+          const cols = db.prepare(`PRAGMA main.table_info("${t}")`).all().map(c => c.name).filter(c => c !== 'id' && theirs.has(c)).map(c => `"${c}"`).join(', ');
+          if (!cols) continue;
+          n += Number(db.prepare(`INSERT INTO main."${t}" (${cols}) SELECT ${cols} FROM online."${t}" o
+            WHERE NOT EXISTS (SELECT 1 FROM main."${t}" m WHERE m.created_at = o.created_at AND m.email = o.email)`).run().changes);
+        } catch (e) { log(`[sincronizare] rândurile din ${t} nu au putut fi copiate: ${e.message}`); }
+      }
+    } finally { db.close(); }
+    return n;
+  }
+
   async function tick() {
     if (running) return null;
     running = true;
     try {
       flush();
-      const local = readFileSync(file);
-      const localSha = sha(local);
+      let local = readFileSync(file);
+      let localSha = sha(local);
       const online = await remote.head();
       const localChanged = localSha !== rec.sha;
       const remoteChanged = !!online && online.version !== rec.version;
@@ -50,6 +70,13 @@ export function createDbSync({file = 'data/purapa.db', record = 'data/.db-sync.j
           mkdirSync('data/backup', {recursive: true});
           const saved = `data/backup/${stamp()}-online-${DB_NAME}`;
           writeFileSync(saved, buf);
+          const kept = mergeRows(saved);
+          if (kept) {
+            flush();
+            local = readFileSync(file);
+            localSha = sha(local);
+            log(`[sincronizare] ${kept} lead-uri primite online au fost păstrate`);
+          }
           const version = await remote.put(local, {force: true});
           rec = {version, sha: localSha};
           writeRecord(rec);

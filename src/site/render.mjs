@@ -679,6 +679,8 @@ const SECTIONS = {
       </div>`, ' tr-section');
   },
 
+  // Contact: mesajul ajunge în Brain, la Leads (site.js îl trimite fără să părăsească pagina). Dacă serverul nu răspunde,
+  // mesajul completat se deschide în aplicația de email a vizitatorului, ca să nu se piardă.
   contact: (ctx, s) => wrap(s, `${rhead(ctx, s)}<div class="contact-grid">
     <ul class="contact-data" data-stagger>
       <li data-reveal><span>Telefon</span><a href="${ctx.text('{telefon_link}')}">${ctx.text('{telefon}')}</a><br>${ctx.text('{program}')}</li>
@@ -687,18 +689,17 @@ const SECTIONS = {
     </ul>
     <div class="contact-form">${s.note ? `<h2 data-reveal style="--i:1">${title(ctx, s.note)}</h2>` : ''}
     <form method="post" class="form" data-reveal style="--i:2" toolname="trimite_mesaj_purapa"
-      tooldescription="Trimite un mesaj echipei Purapa (întrebări despre filtre, testarea apei, comenzi sau programul de ambasadori). Cere nume, email, subiect și mesaj; telefonul e opțional. Trimiterea o confirmă vizitatorul." ${ctx.staticSite
-      // Site static (fără server care să primească mesajul): același formular, dar la trimitere mesajul completat se deschide
-      // în aplicația de email a vizitatorului (site.js îl așază frumos; fără JavaScript, browserul face același lucru, mai brut).
-      ? `action="mailto:${ctx.text('{email}')}" enctype="text/plain" data-mailto="${ctx.text('{email}')}"`
-      : 'action="/api/public/contact"'}>
+      tooldescription="Trimite un mesaj echipei Purapa (întrebări despre filtre, testarea apei, comenzi sau programul de ambasadori). Cere nume, email, subiect și mesaj; telefonul e opțional. Trimiterea o confirmă vizitatorul."
+      action="/api/public/contact" data-lead data-mailto="${ctx.text('{email}')}">
       <label>Nume complet <input name="name" required autocomplete="name" toolparamdescription="Numele complet al persoanei care scrie"></label>
       <label>Email <input name="email" type="email" required autocomplete="email" toolparamdescription="Adresa de email la care Purapa răspunde"></label>
       <label>Telefon (opțional) <input name="phone" type="tel" autocomplete="tel" toolparamdescription="Număr de telefon, opțional"></label>
       <label>Subiect <input name="subject" required toolparamdescription="Subiectul mesajului, în câteva cuvinte"></label>
       <label>Mesaj <textarea name="message" minlength="20" required toolparamdescription="Mesajul sau întrebarea, cel puțin 20 de caractere"></textarea></label>
+      <label class="hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off" toolparamdescription="Lasă acest câmp gol"></label>
       <div><button class="btn">Trimite mesajul${icon('arrow')}</button></div>
-      ${ctx.staticSite ? '<p class="form-note" role="status" hidden>Mesajul tău s-a deschis în aplicația de email. Apasă „Trimite” acolo și îl primim.</p>' : ''}
+      <p class="form-note" data-sent role="status" tabindex="-1" hidden>Mulțumim! Am primit mesajul tău și îți răspundem în ${ctx.text('{raspuns}')}.</p>
+      <p class="form-note" data-mail role="status" hidden>Mesajul nu a putut fi trimis direct, așa că s-a deschis în aplicația de email. Apasă „Trimite” acolo și îl primim.</p>
     </form></div></div>`)
 };
 

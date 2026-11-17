@@ -243,14 +243,16 @@ export const ENTITIES = [
     ]
   },
   {
-    key: 'cereri', table: 'messages', label: 'Mesaje de contact', one: 'Mesaj',
+    // Leads: mesajele din formularul de contact și înscrierile de ambasadori. Se văd în panou la /manage/leads/.
+    key: 'cereri', table: 'messages', label: 'Leads', one: 'Lead',
     category: 'operational', color: '#999999', title: 'subject', noStatus: true, operational: true, standalone: true, creatable: false,
     fields: [
       {key: 'name', label: 'Nume', type: 'text', required: true},
       {key: 'email', label: 'Email', type: 'email', required: true},
       {key: 'phone', label: 'Telefon', type: 'phone'},
       {key: 'subject', label: 'Subiect', type: 'text', required: true},
-      {key: 'message', label: 'Mesaj', type: 'textarea', required: true}
+      {key: 'message', label: 'Mesaj', type: 'textarea', required: true},
+      {key: 'source', label: 'Sursă', type: 'text'}
     ]
   },
   {

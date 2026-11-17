@@ -42,6 +42,23 @@ ${rows.map(r => `<tr><td><a href="${base(key, r.id)}">${esc(titleOf(d, r))}</a>$
   return page(user, {title: d.label, active: 'entitati', crumbs: [['Entități', '/manage/entitati/'], [d.label]], body, counts: ctx.counts});
 }
 
+// Leads: ce a venit prin formularele site-ului (contact, ambasadori), cele mai noi primele, cu datele de contact la îndemână.
+export function leads(ctx) {
+  const {store, user} = ctx;
+  const rows = [...store.list('cereri')].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  const cut = s => { const t = String(s ?? '').replace(/\s+/g, ' ').trim(); return t.length > 160 ? `${t.slice(0, 160)}…` : t; };
+  const body = `<div class="head"><h1>Leads <span class="muted">${rows.length}</span></h1></div>
+<section class="panel">
+<input class="filter" type="search" placeholder="Caută după nume, email, subiect…" data-filter="#rows">
+<table class="table" id="rows"><thead><tr><th>Primit</th><th>Nume</th><th>Contact</th><th>Mesaj</th><th>Sursă</th></tr></thead><tbody>
+${rows.map(r => `<tr><td class="nowrap">${fmtDate(r.created_at)}</td><td>${esc(r.name)}</td>
+  <td><a href="mailto:${esc(r.email)}">${esc(r.email)}</a>${r.phone ? `<br><a href="tel:${esc(String(r.phone).replace(/[^\d+]/g, ''))}">${esc(r.phone)}</a>` : ''}</td>
+  <td><a href="${base('cereri', r.id)}"><strong>${esc(r.subject)}</strong></a><br><span class="muted">${esc(cut(r.message))}</span></td>
+  <td>${esc(r.source ?? '—')}</td></tr>`).join('')}
+</tbody></table>${rows.length ? '' : empty('Nu a venit încă niciun lead. Mesajele din formularul de contact apar aici.')}</section>`;
+  return page(user, {title: 'Leads', active: 'leads', crumbs: [['Leads']], body, counts: ctx.counts});
+}
+
 function input(f, value, {store, disabled}) {
   const id = `f-${f.key}`;
   const dis = disabled || f.readonly ? ' disabled' : '';
