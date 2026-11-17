@@ -12,7 +12,7 @@ updated: 2026-11-11
 
 Cum citești gradele germane, cum îți măsori apa și ce soluții există pentru calcar, de la oțet la dedurizator.
 
-![Apă care curge dintr-un cap de duș rotund, din oțel inoxidabil](https://images.unsplash.com/photo-1568564485646-8387cc48ed0e?w=1600&h=900&fit=crop&q=80&auto=format)
+![Apă care curge dintr-un cap de duș rotund, din oțel inoxidabil](https://purapa.ro/media/60bb341531e685fb827b1bd933efe37c3b257daa.webp?v=2026-11-17T13%3A54%3A13.839Z)
 
 Duritatea apei arată cât calciu și magneziu are apa dizolvate în ea. În România se exprimă de obicei în grade germane (°dH), iar 1 °dH înseamnă 17,85 mg/L carbonat de calciu. Apa dură nu e periculoasă pentru sănătate, dar costă bani: lasă calcar în centrală, boiler, mașina de spălat și fierbător. Când duritatea trece de circa 10 °dH și ai o casă cu centrală și boiler, un dedurizator la intrarea apei merită luat în calcul.
 

@@ -12,7 +12,7 @@ updated: 2026-11-12
 
 De ce clorul e uneori mai puternic, cum citești clorul liber și clorul total și ce soluții funcționează pentru gustul apei.
 
-![Apă fierbinte turnată dintr-un ceainic alb într-o ceașcă albă](https://images.unsplash.com/photo-1610961590736-80cc81a30d71?w=1600&h=900&fit=crop&q=80&auto=format)
+![Apă fierbinte turnată dintr-un ceainic alb într-o ceașcă albă](https://purapa.ro/media/d27ef14f3bfaaf4321d17eb2b5530faf32e3e561.webp?v=2026-11-17T13%3A54%3A15.857Z)
 
 Apa de la robinet miroase a clor pentru că furnizorul o dezinfectează cu clor, ca să ajungă sigură până la tine. În cantitățile prevăzute de lege, între 0,10 și 0,50 mg/L clor liber, clorul nu e un pericol pentru sănătate, dar poate strica gustul apei, al cafelei și al ceaiului. După ce apa a ajuns în casă, nu mai ai nevoie de gustul lui, iar un filtru cu carbon activ îl reduce.
 

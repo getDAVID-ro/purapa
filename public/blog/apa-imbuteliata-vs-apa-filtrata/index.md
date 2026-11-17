@@ -12,7 +12,7 @@ updated: 2026-11-12
 
 Calculul pas cu pas pentru o familie de 3 persoane: cât costă apa plată pe an, câte sticle înseamnă și în câte luni se amortizează un filtru.
 
-![Rânduri de sticle de plastic cu apă, cu dopuri albe](https://images.unsplash.com/photo-1536939459926-301728717817?w=1600&h=900&fit=crop&q=80&auto=format)
+![Rânduri de sticle de plastic cu apă, cu dopuri albe](https://purapa.ro/media/d3e8e165d81487bd27940947492d9a54c7f3caf3.webp?v=2026-11-17T13%3A54%3A15.306Z)
 
 O familie de 3 persoane care bea doar apă plată îmbuteliată consumă în jur de 1.620 de litri pe an, adică aproximativ 810 sticle de 2 L. În funcție de cât plătește pe litru, asta înseamnă între circa 2.400 și 5.700 de lei pe an. Un filtru sub chiuvetă costă o dată la cumpărare, apoi în jur de 441 de lei pe an pentru cartușe, așa că se plătește din banii pe apa plată în 5 până la 11 luni.
 

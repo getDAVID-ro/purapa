@@ -12,7 +12,7 @@ updated: 2026-11-12
 
 La cât timp schimbi prefiltrul și cartușul principal, ce semne arată că un cartuș s-a consumat și cum montezi kitul pas cu pas.
 
-![Mâini care montează racorduri pe țevile din dulapul de sub chiuvetă](https://images.unsplash.com/photo-1676210133055-eab6ef033ce3?w=1600&h=900&fit=crop&q=80&auto=format)
+![Mâini care montează racorduri pe țevile din dulapul de sub chiuvetă](https://purapa.ro/media/de64e386d3567ed51197a418412b43d2dc505664.webp?v=2026-11-17T13%3A54%3A16.317Z)
 
 La kitul de filtrare Purapa, prefiltrul de 5 µm se schimbă la 2–3 luni, iar cartușul principal de microfiltrare OK36M la 12 luni sau după 11.000 L, care vine primul. Montajul kitului durează în medie 60–90 de minute, iar schimbarea unui cartuș câteva minute; amândouă se pot face fără instalator, dacă te descurci cu racorduri simple.
 

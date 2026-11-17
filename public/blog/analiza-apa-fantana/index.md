@@ -12,7 +12,7 @@ updated: 2026-11-11
 
 Ce poate contamina apa din fântână, de ce contează nitrații mai ales pentru bebeluși și un plan simplu de testare.
 
-![Fântână veche de lemn, cu găleată și jgheab, într-o curte](https://images.unsplash.com/photo-1762021699726-a479928196d0?w=1600&h=900&fit=crop&q=80&auto=format)
+![Fântână veche de lemn, cu găleată și jgheab, într-o curte](https://purapa.ro/media/657a3ef1558e152d1e0b0e150f44976156c47f3f.webp?v=2026-11-17T13%3A54%3A47.280Z)
 
 Apa din fântână sau din puț poate fi limpede, rece și fără miros și totuși să aibă nitrați peste limită sau bacterii precum E. coli. Pentru că nimeni nu o tratează și nimeni nu o analizează în locul tău, singura cale de a ști e s-o testezi: un test chimic acasă, un test pentru E. coli și, dacă ceva iese în afara limitelor, o analiză de laborator.
 

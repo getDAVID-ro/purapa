@@ -12,7 +12,7 @@ updated: 2026-11-11
 
 Cum funcționează un dedurizator, ce înseamnă fiecare specificație, cum se instalează și ce întreținere cere.
 
-![Cameră de spălătorie luminoasă, cu mașina de spălat sub un raft cu coș și plante](https://images.unsplash.com/photo-1655041448985-f6666cba2d6c?w=1600&h=900&fit=crop&q=80&auto=format)
+![Cameră de spălătorie luminoasă, cu mașina de spălat sub un raft cu coș și plante](https://purapa.ro/media/7d79b702f30fd23ce477ff5e44b6d4b910602b48.webp?v=2026-11-17T13%3A54%3A14.421Z)
 
 Un dedurizator de apă pentru casă se montează la intrarea apei și oprește calcarul pentru toate robinetele, dușul, centrala, boilerul și electrocasnicele. Ca să alegi modelul potrivit ai nevoie de trei date: cât de dură e apa ta, ce debit folosești la vârf și câte persoane locuiesc în casă. Pentru 1–4 persoane, un dedurizator compact cu 9 L de rășină și debit de până la 1 m³/h acoperă de obicei nevoile.
 

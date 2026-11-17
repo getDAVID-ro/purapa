@@ -12,7 +12,7 @@ updated: 2026-11-12
 
 Cum funcționează programul, pentru cine e potrivit și de ce e ușor să recomanzi ceva în care crezi.
 
-![Cinci prieteni tineri care zâmbesc spre cameră, în aer liber, la apus](https://images.unsplash.com/photo-1569617084133-26942bb441f2?w=1600&h=900&fit=crop&q=80&auto=format)
+![Cinci prieteni tineri care zâmbesc spre cameră, în aer liber, la apus](https://purapa.ro/media/a000af234442535a70627ac947cec97e3d79a9ee.webp?v=2026-11-17T13%3A54%3A20.699Z)
 
 Programul de Ambasadori Purapa e pentru oamenii care le recomandă deja prietenilor ce le-a plăcut. Te înscrii printr-un formular, recomanzi Purapa când și cui vrei, iar pentru fiecare achiziție făcută prin codul tău primești un comision. Nu există ținte de vânzări, nu există minim de recomandări și nu ai nicio obligație.
 

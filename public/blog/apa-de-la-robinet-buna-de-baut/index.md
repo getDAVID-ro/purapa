@@ -12,7 +12,7 @@ updated: 2026-11-11
 
 Ce spune legea, de ce apa ta poate fi diferită de cea din buletinul furnizorului și cum o verifici fără să pleci de acasă.
 
-![Apă care curge dintr-un robinet de bucătărie](https://images.unsplash.com/photo-1521207418485-99c705420785?w=1600&h=900&fit=crop&q=80&auto=format)
+![Apă care curge dintr-un robinet de bucătărie](https://purapa.ro/media/0769f99339427fdbe3ac6d785438ebadd2cdf9f4.webp?v=2026-11-17T13%3A54%3A10.535Z)
 
 Da, în general apa de la robinet din România e bună de băut atunci când pleacă din stația de tratare: furnizorul o analizează și trebuie să respecte valorile din OG 7/2023. Problema e drumul până la tine. Țevile vechi, rezervoarele de bloc sau apa care stă nefolosită pot schimba ce ajunge în pahar, iar singurul răspuns sigur e un test al apei din robinetul tău.
 

@@ -12,7 +12,7 @@ updated: 2026-11-11
 
 Pașii testului rapid, cum fotografiezi corect banda și ce înseamnă fiecare dintre cei 16 parametri din raport.
 
-![Apă turnată într-un pahar transparent](https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=1600&h=900&fit=crop&q=80&auto=format)
+![Apă turnată într-un pahar transparent](https://purapa.ro/media/096857db1301248ad021fad8115b42ba2a3dbd5d.webp?v=2026-11-17T13%3A54%3A11.459Z)
 
 Testarea apei acasă durează sub 5 minute: ții banda de test 2–3 secunde în apă, aștepți circa 30 de secunde, o fotografiezi lângă scala de culori și primești un raport pentru 16 parametri. Raportul îți spune pe înțeles ce înseamnă fiecare valoare și ce poți face mai departe. Testul rapid Purapa e o evaluare orientativă, nu o analiză de laborator acreditat, dar e cel mai simplu prim pas ca să afli ce ai în apă.
 

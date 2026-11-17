@@ -12,7 +12,7 @@ updated: 2026-11-12
 
 Ce face calcarul în espressor și în mașina de spălat pahare, ce apă îți trebuie pentru cafea și cum înlocuiești bidoanele din birou.
 
-![Espresso care curge dintr-un aparat profesional într-o ceașcă de porțelan](https://images.unsplash.com/photo-1475296204602-08d15839e95f?w=1600&h=900&fit=crop&q=80&auto=format)
+![Espresso care curge dintr-un aparat profesional într-o ceașcă de porțelan](https://purapa.ro/media/756f4047586e304e998aa30aba28dc09d33a3624.webp?v=2026-11-17T13%3A54%3A16.772Z)
 
 Calcarul e cea mai scumpă problemă a unui espressor profesional: înfundă boilerul, grupurile și electrovalvele, aduce intervenții de service și zile în care aparatul nu merge. Un dedurizator dedicat, montat înaintea espressorului și a mașinii de spălat pahare, previne problema din start. În birouri, aceeași idee înlocuiește bidoanele de apă cu un dozator legat la rețea, cu filtrare.
 

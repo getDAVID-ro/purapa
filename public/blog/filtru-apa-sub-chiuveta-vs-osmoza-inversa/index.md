@@ -12,7 +12,7 @@ updated: 2026-11-12
 
 Ce rețin cana filtrantă, filtrul sub chiuvetă și osmoza inversă, ce costă în timp și care se potrivește apei tale.
 
-![Robinet modern de bucătărie din care curge apă într-o chiuvetă dublă](https://images.unsplash.com/photo-1784790601912-b30717b805b8?w=1600&h=900&fit=crop&q=80&auto=format)
+![Robinet modern de bucătărie din care curge apă într-o chiuvetă dublă](https://purapa.ro/media/aa363e52d5ece5fbc7079d4d912f5959a428818f.webp?v=2026-11-17T13%3A54%3A14.742Z)
 
 Nu există un „cel mai bun filtru de apă”, ci filtrul potrivit apei tale. Pentru apa de la rețea, unde problema e de obicei gustul de clor, mirosul sau particulele din țevi, un filtru sub chiuvetă cu carbon activ e de ajuns și păstrează mineralele. Pentru apa de fântână cu nitrați sau metale peste limită, osmoza inversă e alegerea mai potrivită, dar numai după o analiză de laborator. Cana filtrantă e o soluție ieftină pentru început, cu capacitate mică.
 
