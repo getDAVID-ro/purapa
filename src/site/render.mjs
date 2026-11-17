@@ -21,14 +21,33 @@ const SITE_URL = (process.env.SITE_URL ?? 'https://purapa.ro').replace(/\/$/, ''
 export const indexable = () => process.env.SITE_INDEX === '1';
 // Fără Disallow: Google trebuie să poată citi paginile ca să vadă „noindex”. O adresă blocată în robots.txt
 // poate ajunge totuși în index, din linkurile altor site-uri.
+// La lansare: tot site-ul e deschis, inclusiv pentru crawlerele asistenților AI (GEO); doar panoul și API-ul sunt închise.
+// Fiecare crawler numit are grupul lui, deci și regulile pentru /manage/ și /api/ se repetă acolo.
+const AI_BOTS = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'PerplexityBot', 'Google-Extended', 'Applebot-Extended'];
+const CLOSED = 'Allow: /\nDisallow: /manage/\nDisallow: /api/\n';
 export const robotsTxt = () => indexable()
-  ? `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`
+  ? `User-agent: *\n${CLOSED}\n# Crawlerele asistenților AI: permise\n${AI_BOTS.map(b => `User-agent: ${b}\n${CLOSED}`).join('\n')}\nSitemap: ${SITE_URL}/sitemap.xml\n`
   : '# Previzualizare: paginile au „noindex” și nu apar în motoarele de căutare.\nUser-agent: *\nAllow: /\n';
+export const siteUrl = () => SITE_URL;
 
 const num = n => new Intl.NumberFormat('ro-RO', {maximumFractionDigits: 2}).format(n);
 const lei = n => n == null ? '' : `${num(n)} lei`;
 const microns = n => `${String(n).replace('.', ',')} µm`;
 const plainTitle = t => String(t ?? '').replace(/\*/g, '');
+// Titlurile și descrierile din <head> (title, description, Open Graph, Twitter) se scriu fără diacritice:
+// unele rezultate de căutare și previzualizări de link le afișează greșit. Conținutul paginii le păstrează.
+const DIAC = {ă: 'a', â: 'a', î: 'i', ș: 's', ş: 's', ț: 't', ţ: 't', Ă: 'A', Â: 'A', Î: 'I', Ș: 'S', Ş: 'S', Ț: 'T', Ţ: 'T'};
+export const noDiacritics = t => String(t ?? '').replace(/[ăâîșşțţĂÂÎȘŞȚŢ]/g, c => DIAC[c]);
+// Imaginile JPG/PNG din media au o variantă WebP pregătită (npm run bake:images); paginile o cer pe ea.
+const webp = m => {
+  const file = m && /^\/media\/([^?]+\.(?:jpe?g|png))/i.exec(m.src)?.[1];
+  const alt = file && baked(file, 'base');
+  return alt ? {...m, src: alt} : m;
+};
+const jsonLd = data => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;
+// Adresa absolută a unei imagini (cele externe, de ex. Unsplash, rămân cum sunt).
+const absImage = m => { if (!m) return undefined; const src = webp(m).src; return /^https?:/.test(src) ? src : `${SITE_URL}${src}`; };
+const ORG_ID = `${SITE_URL}/#firma`, SITE_ID = `${SITE_URL}/#site`;
 
 // Aceeași formulă ca în site.js (calculatorul din browser): economia = apa îmbuteliată − cartușele.
 export function calc({liters, cost, yearly, kit, bottle}) {
@@ -91,7 +110,7 @@ function picture(ctx, id, uid, {sizes = ''} = {}) {
   const file = /\/media\/([^?]+)/.exec(m.src)?.[1], sc = SCENES[file];
   if (!sc) {
     const dims = m.width && m.height ? ` width="${m.width}" height="${m.height}"` : '';
-    return {tall, html: `<img src="${esc(m.src)}" alt="${esc(m.alt)}"${dims}${sizes ? ` sizes="${sizes}"` : ''} loading="lazy" decoding="async">`};
+    return {tall, html: `<img src="${esc(webp(m).src)}" alt="${esc(m.alt)}"${dims}${sizes ? ` sizes="${sizes}"` : ''} loading="lazy" decoding="async">`};
   }
   const img = `<image href="${esc(baked(file, 'base') ?? m.src)}" width="${sc.width}" height="${sc.height}"/>`, patch = baked(file, 'patch');
   const box = `maskUnits="userSpaceOnUse" x="0" y="0" width="${sc.width}" height="${sc.height}"`;
@@ -125,7 +144,7 @@ function cutout(ctx, id, uid) {
 }
 
 function image(ctx, id, {cls = '', eager = false, sizes = ''} = {}) {
-  const m = ctx.media(id);
+  const m = webp(ctx.media(id));
   if (!m) return '';
   const dims = m.width && m.height ? ` width="${m.width}" height="${m.height}"` : '';
   return `<img${cls ? ` class="${cls}"` : ''} src="${esc(m.src)}" alt="${esc(m.alt)}"${dims}${sizes ? ` sizes="${sizes}"` : ''}
@@ -221,7 +240,7 @@ const SECTIONS = {
     // Lebăda din logo, în picătură: site.js o decupează din imaginea logo-ului și o arată refractată prin apă.
     const brand = !visual && s.drop_mark === 'lebada' ? ctx.within(ctx.component, 'Semnul din picătură', () => ctx.one('firma')) : null;
     const markMedia = brand?.logo_id ? ctx.within(ctx.component, 'Semnul din picătură', () => ctx.media(brand.logo_id)) : null;
-    const mark = markMedia ? ` data-mark="${esc(markMedia.src)}"` : '';
+    const mark = markMedia ? ` data-mark="${esc(webp(markMedia).src)}"` : '';
     const tag = i === 0 ? 'h1' : 'h2';
     return `<section class="fx-hero${visual ? '' : ' solo'}" aria-labelledby="s-${s.id}" data-zone><div class="container fx-hero-grid">
       <div class="copy">${s.kicker ? `<p class="eyebrow" data-reveal>${ctx.text(s.kicker)}</p>` : ''}
@@ -688,7 +707,12 @@ function renderSection(ctx, s, i) {
   if (!fn) throw new Error(`Tip de secțiune necunoscut: ${s.kind}`);
   const html = ctx.within(`Secțiunea «${plainTitle(s.title) || s.kind}»`, 'Conținutul secțiunii', () => fn(ctx, s, i));
   // Prima secțiune a unei pagini fără hero ține loc de început de pagină: fundalul lui și titlul care urcă pe cuvinte.
-  return i === 0 && s.kind !== 'hero' ? html.replace('<section class="section', '<section class="section fx-top').replace('<h2 id="s-', '<h2 data-split id="s-') : html;
+  // Titlul ei devine H1-ul paginii (fiecare pagină are exact unul), cu aspectul unui H2 (clasa h2).
+  if (i !== 0 || s.kind === 'hero') return html;
+  const top = html.replace('<section class="section', '<section class="section fx-top');
+  if (top.includes('<h1')) return top;
+  const h = new RegExp(`<h2([^>]*) id="s-${s.id}"([^>]*)>([\\s\\S]*?)</h2>`);
+  return h.test(top) ? top.replace(h, (m, a, b, inner) => `<h1 class="h2"${a.replace(' data-split', '')} data-split id="s-${s.id}"${b}>${inner}</h1>`) : top;
 }
 
 function logo(ctx, f) {
@@ -744,7 +768,7 @@ function footer(ctx) {
           <li><a href="${ctx.text('{telefon_link}')}">${ctx.text('{telefon}')}</a></li>
           <li><a href="mailto:${ctx.text('{email}')}">${ctx.text('{email}')}</a></li>
           <li>${ctx.text('{program}')}</li><li>${ctx.text('{adresa}')}</li></ul></div>
-        <nav aria-labelledby="f-legal"><h2 id="f-legal">Legal</h2><ul>${links('legal')}</ul></nav>
+        <nav aria-labelledby="f-legal"><h2 id="f-legal">Legal</h2><ul>${links('legal')}<li><a href="/sitemap.xml">Harta site-ului</a></li></ul></nav>
       </div>
       <div class="ft-anpc"><a href="https://reclamatiisal.anpc.ro/" target="_blank" rel="noopener"><img src="/assets/anpc-sal.png" alt="ANPC: Soluționarea alternativă a litigiilor (se deschide într-o fereastră nouă)" width="201" height="50" loading="lazy"></a></div>
       <div class="legal"><span>${esc(f.brand)} este o marcă ${esc(f.legal_name)}</span><span>CUI ${esc(f.cui)} · ${esc(f.reg_com)}</span></div>
@@ -752,11 +776,65 @@ function footer(ctx) {
   });
 }
 
-function shell(ctx, {path, title: pageTitle, description}, body) {
-  const brand = ctx.within('Cap de pagină', 'Brandul în titlu', () => ctx.one('firma')?.brand ?? '');
+// Versiunea Markdown a unei pagini, pentru asistenții AI: / → /index.md, /contact/ → /contact/index.md.
+export const mdPath = path => `${path}index.md`;
+// Telefonul în format internațional, pentru datele structurate: „0372 887 572” → „+40372887572”.
+const intlPhone = p => { const d = String(p ?? '').replace(/\D/g, ''); return d ? (d.startsWith('0') ? `+4${d}` : `+${d}`) : undefined; };
+// „Luni – Vineri: 09:00 – 18:00” → programul în schema.org, doar dacă textul are exact această formă.
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const RO_DAYS = ['luni', 'marți', 'miercuri', 'joi', 'vineri', 'sâmbătă', 'duminică'];
+function openingHours(text) {
+  const m = /^\s*(\p{L}+)\s*[–-]\s*(\p{L}+)\s*:\s*(\d{1,2}:\d{2})\s*[–-]\s*(\d{1,2}:\d{2})\s*$/u.exec(String(text ?? ''));
+  const from = m && RO_DAYS.indexOf(m[1].toLowerCase()), to = m && RO_DAYS.indexOf(m[2].toLowerCase());
+  if (!m || from < 0 || to < from) return undefined;
+  return {'@type': 'OpeningHoursSpecification', dayOfWeek: DAYS.slice(from, to + 1), opens: m[3].padStart(5, '0'), closes: m[4].padStart(5, '0')};
+}
+
+// „Titlu | Brand”, fără să repete brandul (dacă titlul îl conține deja) și fără să treacă de 60 de caractere,
+// cât încape în rezultatele de căutare.
+const fullTitle = (name, brand) => !brand || name.toLowerCase().includes(brand.toLowerCase()) || name.length + brand.length + 3 > 60 ? name : `${name} | ${brand}`;
+
+// Capul paginii: titlul și descrierea (fără diacritice), canonical pe domeniul final, Open Graph, versiunea Markdown și
+// datele structurate comune (firma, site-ul, pagina, firimiturile), la care se adaugă cele ale paginii (`ld`).
+function shell(ctx, {path, title: pageTitle, description, image: img, type = 'WebPage', crumbs = [], ld = []}, body) {
+  const f = ctx.within('Cap de pagină', 'Brandul în titlu', () => ctx.one('firma')) ?? {};
+  const brand = f.brand ?? '';
+  const name = plainTitle(pageTitle);
+  const desc = description ? noDiacritics(String(description).replace(/\s+/g, ' ').trim()) : '';
+  const url = path ? `${SITE_URL}${path}` : null;
+  let head = '';
+  if (url) {
+    const socials = ctx.within('Cap de pagină', 'Datele structurate ale firmei', () => ctx.query('retele', {fields: ['url']}));
+    const logoM = f.logo_id ? ctx.within('Cap de pagină', 'Datele structurate ale firmei', () => ctx.media(f.logo_id)) : null;
+    // Imaginea pentru linkurile distribuite: a paginii, altfel a primului produs.
+    const pic = img ?? ctx.within('Cap de pagină', 'Imaginea implicită', () => ctx.media(ctx.query('produse', {
+      fields: ['image_id', 'position'], sort: (a, b) => (a.position ?? 0) - (b.position ?? 0)})[0]?.image_id));
+    const org = {'@type': 'Organization', '@id': ORG_ID, name: brand, legalName: f.legal_name || undefined, url: `${SITE_URL}/`,
+      logo: absImage(logoM), email: f.email || undefined, telephone: intlPhone(f.phone), taxID: f.cui || undefined,
+      address: f.street ? {'@type': 'PostalAddress', streetAddress: [f.street, f.building].filter(Boolean).join(', '),
+        addressLocality: f.city || undefined, addressRegion: f.county || undefined, addressCountry: 'RO'} : undefined,
+      contactPoint: f.phone || f.email ? {'@type': 'ContactPoint', contactType: 'customer service', telephone: intlPhone(f.phone),
+        email: f.email || undefined, availableLanguage: 'ro', hoursAvailable: openingHours(f.hours)} : undefined,
+      sameAs: socials.length ? socials.map(s => s.url) : undefined};
+    const trail = path === '/' ? [] : [{name: 'Acasă', path: '/'}, ...crumbs];
+    const graph = [org,
+      {'@type': 'WebSite', '@id': SITE_ID, url: `${SITE_URL}/`, name: brand, inLanguage: 'ro', publisher: {'@id': ORG_ID}},
+      {'@type': type, '@id': `${url}#pagina`, url, name, description: description || undefined, inLanguage: 'ro', isPartOf: {'@id': SITE_ID},
+        primaryImageOfPage: pic ? {'@type': 'ImageObject', url: absImage(pic)} : undefined,
+        breadcrumb: trail.length ? {'@id': `${url}#firimituri`} : undefined},
+      ...(trail.length ? [{'@type': 'BreadcrumbList', '@id': `${url}#firimituri`, itemListElement: trail.map((c, i) =>
+        ({'@type': 'ListItem', position: i + 1, name: plainTitle(c.name), item: `${SITE_URL}${c.path}`}))}] : []),
+      ...ld];
+    const ogTitle = esc(noDiacritics(name));
+    head = `<link rel="canonical" href="${esc(url)}"><link rel="alternate" type="text/markdown" href="${esc(mdPath(path))}">
+<meta property="og:type" content="${ld.some(x => x['@type'] === 'BlogPosting') ? 'article' : 'website'}"><meta property="og:site_name" content="${esc(brand)}"><meta property="og:locale" content="ro_RO">
+<meta property="og:url" content="${esc(url)}"><meta property="og:title" content="${ogTitle}">${desc ? `<meta property="og:description" content="${esc(desc)}">` : ''}${pic ? `<meta property="og:image" content="${esc(absImage(pic))}">${pic.width ? `<meta property="og:image:width" content="${pic.width}"><meta property="og:image:height" content="${pic.height}">` : ''}` : ''}
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${ogTitle}">${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
+${jsonLd({'@context': 'https://schema.org', '@graph': graph})}`;
+  }
   return `<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(plainTitle(pageTitle))}${brand ? ` | ${esc(brand)}` : ''}</title>${description ? `<meta name="description" content="${esc(description)}">` : ''}
-${!indexable() ? '<meta name="robots" content="noindex, nofollow">' : path ? `<link rel="canonical" href="${SITE_URL}${esc(path)}">` : ''}<meta name="theme-color" content="#254a99">
+<title>${esc(noDiacritics(fullTitle(name, brand)))}</title>${desc ? `<meta name="description" content="${esc(desc)}">` : ''}
+${!indexable() || !path ? '<meta name="robots" content="noindex, nofollow">' : ''}${head}<meta name="theme-color" content="#254a99">
 <link rel="preload" href="/assets/fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css?v=${ASSET_V}">
 <script>document.documentElement.classList.add('fx-js');setTimeout(function(){if(!window.__fx)document.documentElement.classList.add('fx-still')},4000)</script>
@@ -804,12 +882,12 @@ function renderArticle(ctx, store, path, found) {
   const retailerOf = p => retailers.find(r => r.id === p.retailer_id) ?? (retailers.length === 1 ? retailers[0] : null);
   const date = postDate(a.published_on);
   const cover = ctx.within('Articol', 'Imaginea articolului', () => ctx.media(a.image_id));
-  const plain = html => String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  const ld = [{'@context': 'https://schema.org', '@type': 'Article', headline: a.title, description: a.seo_description || a.excerpt || undefined,
-    datePublished: a.published_on || undefined, author: a.author ? {'@type': 'Person', name: a.author} : undefined,
-    image: cover ? `${SITE_URL}${cover.src}` : undefined, mainEntityOfPage: `${SITE_URL}${path}`},
-  ...(faqs.length ? [{'@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map(q => ({'@type': 'Question', name: q.question,
-    acceptedAnswer: {'@type': 'Answer', text: plain(ctx.rich(q.answer))}}))}] : [])];
+  const url = `${SITE_URL}${path}`;
+  const ld = [{'@type': 'BlogPosting', '@id': `${url}#articol`, headline: a.title, description: a.seo_description || a.excerpt || undefined,
+    datePublished: a.published_on || undefined, dateModified: String(a.published_at ?? a.updated_at ?? '').slice(0, 10) || undefined,
+    author: a.author ? {'@type': 'Person', name: a.author} : {'@id': ORG_ID}, publisher: {'@id': ORG_ID}, inLanguage: 'ro',
+    image: cover ? absImage(cover) : undefined, mainEntityOfPage: {'@id': `${url}#pagina`}},
+  ...(faqs.length ? [faqLd(ctx, url, faqs)] : [])];
   const side = products.length || related.length;
   const body = `<article class="section fx-top post${side ? ' has-aside' : ''}" aria-labelledby="post-title"><div class="container"><div class="post-main">
     <header class="post-head">${blog ? `<nav class="crumbs" aria-label="Unde ești"><a href="/blog/">Blog</a></nav>` : ''}
@@ -829,11 +907,57 @@ function renderArticle(ctx, store, path, found) {
       more: p.buy_url ? `Comandă pe ${esc(retailerOf(p)?.name ?? 'site-ul retailerului')}${icon('external')}` : `Vezi produsele${icon('arrow')}`})).join('')}</ul></section>` : ''}
     ${related.length ? `<section aria-labelledby="post-related"><h2 id="post-related">Citește și</h2><ul class="side-list">${related.map(r => sideItem(ctx, {
       href: publicPath(byKey.articole, r), imageId: r.image_id, title: r.title})).join('')}</ul></section>` : ''}
-  </aside>` : ''}</div></article>
-  <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`;
+  </aside>` : ''}</div></article>`;
   return {status: 200, title: a.title, owner: ['articole', a.id],
-    html: shell(ctx, {path, title: a.seo_title || a.title, description: a.seo_description || a.excerpt}, body)};
+    html: shell(ctx, {path, title: a.seo_title || a.title, description: a.seo_description || a.excerpt, image: cover, ld,
+      crumbs: [...(blog ? [{name: blog.menu_label || blog.title, path: '/blog/'}] : []), {name: a.title, path}]}, body)};
 }
+
+// Datele structurate ale întrebărilor afișate în pagină (doar cele vizibile).
+const plainText = html => String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+function faqLd(ctx, url, faqs) {
+  return {'@type': 'FAQPage', '@id': `${url}#intrebari`, isPartOf: {'@id': `${url}#pagina`}, inLanguage: 'ro',
+    mainEntity: faqs.map(q => ({'@type': 'Question', name: plainText(ctx.text(q.question)), acceptedAnswer: {'@type': 'Answer', text: plainText(ctx.rich(q.answer))}}))};
+}
+
+// Datele structurate ale unei pagini, după secțiunile ei: întrebările, produsele afișate, lista articolelor (blog).
+// Produsele se vând la retailer: oferta are prețul, disponibilitatea și linkul de comandă de acolo. Fără note sau recenzii.
+const AVAILABILITY = {'în stoc': 'https://schema.org/InStock', indisponibil: 'https://schema.org/OutOfStock', 'stoc limitat': 'https://schema.org/LimitedAvailability'};
+function pageLd(ctx, url, sections) {
+  const out = [];
+  const faqs = sections.filter(s => s.kind === 'intrebari').flatMap(s => ctx.within('Date structurate', 'Întrebările paginii', () => ctx.related('sectiuni', s.id, 'faqs')));
+  if (faqs.length) out.push(faqLd(ctx, url, faqs));
+  const seen = new Map();
+  for (const s of sections.filter(s => s.kind === 'produse' || (s.kind === 'hero' && ctx.hasLinks('sectiuni', s.id, 'products')))) {
+    const items = ctx.within('Date structurate', 'Produsele paginii', () => s.category_id
+      ? ctx.query('produse', {scope: `categorii:${s.category_id}`, where: p => p.category_id === s.category_id})
+      : ctx.hasLinks('sectiuni', s.id, 'products') ? ctx.related('sectiuni', s.id, 'products')
+      : ctx.query('produse', {fields: ['name', 'summary', 'price', 'availability', 'image_id', 'buy_url', 'position', 'retailer_id'], sort: (a, b) => (a.position ?? 0) - (b.position ?? 0)}));
+    for (const p of items) seen.set(p.id, p);
+  }
+  if (seen.size) {
+    const brand = ctx.within('Date structurate', 'Brandul', () => ctx.one('firma')?.brand);
+    const retailers = ctx.within('Date structurate', 'Retailerul produselor', () => ctx.query('retaileri', {fields: ['name', 'url']}));
+    const products = [...seen.values()].map(p => {
+      const m = ctx.within('Date structurate', 'Imaginile produselor', () => ctx.media(p.image_id));
+      const r = retailers.find(x => x.id === p.retailer_id) ?? (retailers.length === 1 ? retailers[0] : null);
+      return {'@type': 'Product', name: p.name, description: p.summary ? plainText(ctx.text(p.summary)) : undefined,
+        image: m ? absImage(m) : undefined, brand: brand ? {'@type': 'Brand', name: brand} : undefined, manufacturer: {'@id': ORG_ID},
+        offers: p.price != null ? {'@type': 'Offer', price: Number(p.price).toFixed(2), priceCurrency: 'RON', url: p.buy_url || undefined,
+          availability: AVAILABILITY[String(p.availability ?? '').toLowerCase()],
+          seller: r ? {'@type': 'Organization', name: r.name, url: r.url || undefined} : undefined} : undefined};
+    });
+    out.push({'@type': 'ItemList', '@id': `${url}#produse`, itemListElement: products.map((item, i) => ({'@type': 'ListItem', position: i + 1, item}))});
+  }
+  if (sections.some(s => s.kind === 'articole')) {
+    const posts = ctx.within('Date structurate', 'Articolele de blog', () => ctx.query('articole', {
+      fields: ['title', 'slug', 'published_on'], sort: newestFirst}));
+    out.push({'@type': 'Blog', '@id': `${url}#blog`, url, inLanguage: 'ro', publisher: {'@id': ORG_ID}, blogPost: posts.map(a => ({'@type': 'BlogPosting',
+      headline: a.title, url: `${SITE_URL}${publicPath(byKey.articole, a)}`, datePublished: a.published_on || undefined}))});
+  }
+  return out;
+}
+const PAGE_TYPES = {contact: 'ContactPage', 'despre-noi': 'AboutPage', blog: 'CollectionPage'};
 
 export function renderPath(ctx, store, path) {
   const article = !findPage(store, path, ctx.preview) && findArticle(store, path, ctx.preview);
@@ -847,8 +971,14 @@ export function renderPath(ctx, store, path) {
   const page = ctx.page('pagini', found.id);
   const sections = ctx.within('Conținutul paginii', 'Secțiunile paginii', () => ctx.related('pagini', page.id, 'sections'));
   const body = sections.map((s, i) => renderSection(ctx, s, i)).join('\n');
+  const url = `${SITE_URL}${path}`;
+  // Imaginea paginii (Open Graph): a primei secțiuni cu imagine, altfel a produsului din hero.
+  const withImage = sections.find(s => s.image_id);
+  const heroProduct = !withImage && sections[0]?.kind === 'hero' ? ctx.within('Date structurate', 'Imaginea paginii', () => ctx.related('sectiuni', sections[0].id, 'products'))[0] : null;
+  const pic = ctx.within('Date structurate', 'Imaginea paginii', () => ctx.media(withImage?.image_id ?? heroProduct?.image_id));
   return {status: 200, title: page.title, owner: ['pagini', page.id],
-    html: shell(ctx, {path, title: page.seo_title || page.title, description: page.seo_description}, body)};
+    html: shell(ctx, {path, title: page.seo_title || page.title, description: page.seo_description, image: pic,
+      type: PAGE_TYPES[page.slug] ?? 'WebPage', crumbs: [{name: page.menu_label || page.title, path}], ld: pageLd(ctx, url, sections)}, body)};
 }
 
 export const ASSET_VERSION = ASSET_V;

@@ -120,7 +120,8 @@ test('§5.8 legătura spre o ciornă nu apare; publicarea reface singură pagina
   const s = homeSection('produse');
   propagate(() => store.setLinks(SYSTEM, 'sectiuni', s.id, 'products', [ids.kit, draft.id]));
   assert.doesNotMatch(html('/'), /Filtru nou de test/);
-  assert.equal(db.prepare("SELECT COUNT(*) n FROM page_deps WHERE path = '/' AND kind = 'pending' AND entity = 'produse' AND entity_id = ?").get(draft.id).n, 1);
+  // Ciorna e urmărită (ca „pending”) de secțiune și de datele structurate ale paginii.
+  assert.ok(db.prepare("SELECT COUNT(*) n FROM page_deps WHERE path = '/' AND kind = 'pending' AND entity = 'produse' AND entity_id = ?").get(draft.id).n >= 1);
   const {paths} = propagate(() => store.publish(SYSTEM, 'produse', draft.id));
   assert.ok(paths.includes('/'), paths.join());
   assert.match(html('/'), /Filtru nou de test/);
@@ -158,7 +159,8 @@ test('§5.12 un fișier media actualizat reface paginile care îl folosesc, cu a
   propagate(() => store.update(SYSTEM, 'produse', ids.kit, {image_id: m.id}, {publish: true}));
   assert.match(html('/'), /\/media\/kit\.webp\?v=/);
   const {paths} = propagate(() => store.update(SYSTEM, 'media', m.id, {alt: 'Kit de filtrare Purapa'}));
-  assert.deepEqual(paths, ['/', '/produse/']);
+  // Paginile care o arată, plus cele care o folosesc ca imagine implicită pentru linkurile distribuite (og:image).
+  assert.ok(paths.includes('/') && paths.includes('/produse/'), paths.join());
   assert.match(html('/produse/'), /alt="Kit de filtrare Purapa"/);
   assert.equal(store.get('produse', ids.kit).image_id, m.id);
 });
@@ -243,7 +245,9 @@ test('blogul: un articol publicat are pagina lui și apare în lista de pe /blog
   assert.match(page, /<h1[^>]*>Este bună de băut apa de la robinet\?<\/h1>/);
   assert.match(page, /12 noiembrie 2026/);
   assert.match(page, /Produse recomandate/);
-  assert.match(page, /"@type":"Article"/);
+  assert.match(page, /"@type":"BlogPosting"/);
+  assert.ok(page.includes(`<link rel="canonical" href="https://purapa.ro${path}">`), 'canonical pe domeniul final');
+  assert.ok(page.includes('<title>Este buna de baut apa de la robinet? | '), 'titlul din <head> e fără diacritice');
   // Cuvântul cheie e doar pentru redactare.
   assert.doesNotMatch(page, /apa de la robinet e bună de băut/);
 

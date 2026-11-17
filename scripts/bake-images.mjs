@@ -4,7 +4,8 @@
 //   <hash>-patch.webp    peticele de sub felii, cu fundalul întins lin din jurul lor (un sfert din mărimea imaginii);
 //   <hash>-cutout.webp   imaginea fără fundal, pentru picătura din hero (doar scenele cu `cutout`);
 //   <hash>-base.webp     imaginea scenei în WebP, când originalul e JPG sau PNG (mult mai mică);
-//   <hash>-w160.webp     logo-ul la 160 px lățime, pentru antet și subsol.
+//   <hash>-w160.webp     logo-ul la 160 px lățime, pentru antet și subsol;
+//   <hash>-base.webp     și pentru celelalte imagini JPG/PNG din media (produse, articole), sub 200 KB, ca paginile să ceară doar WebP.
 // Se rulează după ce se schimbă o scenă sau logo-ul: npm run bake:images. Folosește Edge (sau Chrome) fără fereastră.
 import {createServer} from 'node:http';
 import {readFile, writeFile, mkdir, rm} from 'node:fs/promises';
@@ -32,6 +33,8 @@ const db = openDb(process.env.DB ?? 'data/purapa.db');
 migrate(db);
 const store = createStore(db), firm = store.list('firma')[0];
 const logoFile = firm?.logo_id ? basename(String(store.list('media').find(m => m.id === firm.logo_id)?.src ?? '').split('?')[0]) : '';
+const rasters = store.list('media').map(m => String(m.src ?? '')).filter(src => /^[^/:]+\.(jpe?g|png)$/i.test(src) && !SCENES[src] && existsSync(join(MEDIA, src)))
+  .map(file => ({file, base: file.replace(/\.\w+$/, '')}));
 db.close();
 const logos = logoFile && existsSync(join(MEDIA, logoFile)) ? [{file: logoFile, base: logoFile.replace(/\.\w+$/, ''), width: 160}] : [];
 const missing = Object.keys(SCENES).filter(f => !existsSync(join(MEDIA, f)));
@@ -41,12 +44,12 @@ if (missing.length) console.warn(`Lipsesc din ${MEDIA} (rulează npm run import)
 const PAGE = `<!doctype html><meta charset="utf-8"><script>
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const poly = s => s.trim().split(/\\s+/).map(p => p.split(',').map(Number));
-const send = (name, cv, q = .9) => fetch('/out/' + name, {method: 'POST', body: cv.toDataURL('image/webp', q)});
+const send = (name, cv, q = .9) => fetch('/out/' + name, {method: 'POST', body: cv.toDataURL('image/webp', q)}).then(r => r.text()).then(Number);
 // Imaginea întreagă (sau micșorată la lățimea w), în WebP.
 async function copy(img, name, w = img.naturalWidth, q = .82) {
   const cv = document.createElement('canvas'); cv.width = w; cv.height = Math.round(img.naturalHeight * w / img.naturalWidth);
   const g = cv.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(img, 0, 0, cv.width, cv.height);
-  await send(name, cv, q);
+  return send(name, cv, q);
 }
 async function load(file) { const img = new Image(); img.src = '/media/' + file; await img.decode(); return img; }
 
@@ -99,6 +102,11 @@ async function cutout(j, img) {
       if (j.cutout) await cutout(j, img);
       if (!/\\.webp$/i.test(j.file)) await copy(img, j.base + '-base.webp');
     }
+    // Imaginile JPG/PNG obișnuite: WebP la mărimea lor (cel mult 2000 px), cu calitatea coborâtă până intră sub 200 KB.
+    for (const j of ${JSON.stringify(rasters)}) {
+      const img = await load(j.file), w = Math.min(img.naturalWidth, 2000);
+      for (const q of [.85, .8, .75, .7, .65, .6]) { const r = await copy(img, j.base + '-base.webp', w, q); if (r <= 200 * 1024) break; }
+    }
     for (const j of ${JSON.stringify(logos)}) await copy(await load(j.file), j.base + '-w' + j.width + '.webp', j.width, .9);
     await fetch('/done', {method: 'POST', body: 'ok'});
   } catch (e) { await fetch('/done', {method: 'POST', body: String(e)}); }
@@ -121,8 +129,9 @@ const server = createServer(async (req, res) => {
   if (req.url.startsWith('/out/')) {
     const name = basename(decodeURIComponent(req.url.slice(5)));
     await writeFile(join(OUT, name), Buffer.from(text.split(',')[1], 'base64'));
-    written.push(name);
-    return res.end('ok');
+    const buf = Buffer.from(text.split(',')[1], 'base64');
+    if (!written.includes(name)) written.push(name);
+    return res.end(String(buf.length));
   }
   if (req.url === '/done') { res.end('ok'); return finish(text); }
   res.statusCode = 404; res.end();

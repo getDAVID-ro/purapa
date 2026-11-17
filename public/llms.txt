@@ -1,0 +1,37 @@
+# Purapa
+
+> Apă curată și sigură, direct de la robinet. Soluții moderne de filtrare pentru familia ta. Purapa este o marcă Instant Softnet SRL (CUI RO 25383246), Buftea, Ilfov. Produsele se comandă prin retailerul partener; site-ul are ghiduri despre apa de acasă și testul rapid Purapa.
+
+Contact: telefon 0372 887 572, email contact@purapa.ro, program Luni – Vineri: 09:00 – 18:00.
+
+## Pagini
+
+- [Filtre de apa pentru acasa](https://purapa.ro/index.md): Transforma apa de la robinet in apa pura, cristalina si sigura cu sistemele Purapa. Gama completa de filtre, dedurizatoare si teste de apa. Livrare rapida.
+- [Produse](https://purapa.ro/produse/index.md): Descopera gama completa Purapa: filtre de apa pentru bucatarie, cartuse de schimb, sisteme de dedurizare si accesorii premium.
+- [Testare apa potabila – analiza rapida cu Test Rapid Purapa](https://purapa.ro/testare-apa/index.md): Testeaza apa acasa, in sub 5 minute: 16 parametri esentiali, raport digital si recomandari personalizate de filtrare.
+- [Despre Purapa](https://purapa.ro/despre-noi/index.md): Afla povestea PurApa, tehnologia noastra de filtrare si angajamentul pentru a oferi apa potabila sigura in fiecare casa din Romania.
+- [Purapa Ambassadors – recomanda apa curata si primesti comision](https://purapa.ro/ambassadors/index.md): Programul Purapa Ambassadors: recomanzi cu naturalete apa filtrata celor apropiati si primesti comision pentru fiecare achizitie. Fara tinte, fara obligatii.
+- [Contact](https://purapa.ro/contact/index.md): Ai intrebari despre filtrele de apa sau vrei sa programezi un test? Contacteaza echipa PurApa telefonic, prin email sau formular. Raspuns rapid.
+- [Trimite testul rapid Purapa – analiza digitala a apei](https://purapa.ro/test-rapid/index.md): Incarca fotografia benzii de testare si primesti pe loc interpretarea celor 16 parametri, plus raportul complet pe email.
+- [Blog Purapa – ghiduri despre apa de acasa](https://purapa.ro/blog/index.md): Ghiduri despre apa de la robinet si din fantana: testare, duritate, clor, filtre si dedurizatoare.
+- [Devino ambasador Purapa – recomanda apa curata](https://purapa.ro/devino-ambasador/index.md): Inscrie-te in Purapa Ambassadors: recomanzi apa curata celor apropiati si primesti comision pentru fiecare achizitie facuta prin codul tau.
+
+## Articole
+
+- [Apa de la robinet e buna de baut? Ce verifici acasa](https://purapa.ro/blog/apa-de-la-robinet-buna-de-baut/index.md): Afla cand apa de la robinet din Romania e buna de baut, ce spune legea si cum verifici in 5 minute apa din casa ta.
+- [Testare apa acasa: ghid pas cu pas si 16 parametri](https://purapa.ro/blog/testare-apa-acasa/index.md): Cum testezi apa acasa in 5 minute, cum fotografiezi banda si ce inseamna nitratii, duritatea, clorul sau plumbul din raport.
+- [Analiza apa fantana: nitrati, E. coli, ce testezi](https://purapa.ro/blog/analiza-apa-fantana/index.md): Apa din fantana sau put poate parea curata si totusi sa aiba nitrati sau E. coli. Afla ce teste sa faci si ce faci dupa.
+- [Duritatea apei: grade germane, calcar si solutii](https://purapa.ro/blog/duritatea-apei/index.md): Ce inseamna duritatea apei, cum transformi mg/L in grade germane, cand e apa prea dura si cand merita un dedurizator.
+- [Dedurizator apa pentru casa: cum alegi modelul potrivit](https://purapa.ro/blog/dedurizator-apa-casa/index.md): Cum functioneaza un dedurizator cu rasina, ce debit si volum iti trebuie, cata sare consuma si cum iti protejeaza centrala.
+- [Filtru sub chiuveta, cana sau osmoza: ce alegi](https://purapa.ro/blog/filtru-apa-sub-chiuveta-vs-osmoza-inversa/index.md): Comparam filtrul sub chiuveta, cana filtranta si osmoza inversa: ce retin, ce costa in timp si care se potriveste apei tale.
+- [Apa imbuteliata vs apa filtrata: costul pe un an](https://purapa.ro/blog/apa-imbuteliata-vs-apa-filtrata/index.md): Cat cheltuie o familie pe an pe apa plata, cate sticle de plastic arunca si in cate luni se amortizeaza un filtru sub chiuveta.
+- [Clor in apa de la robinet: de ce miroase si ce faci](https://purapa.ro/blog/clor-in-apa-de-la-robinet/index.md): De ce apa de la robinet miroase a clor, cand e normal, cand e prea mult si cum scapi de gust cu un filtru cu carbon activ.
+- [Schimbare cartus filtru apa: cand si cum, pas cu pas](https://purapa.ro/blog/schimbare-cartus-filtru-apa/index.md): La cat timp schimbi prefiltrul si cartusul principal, cum montezi filtrul sub chiuveta si ce semne arata ca un cartus s-a consumat.
+- [Dedurizator pentru espressor: apa tratata in cafenea](https://purapa.ro/blog/dedurizator-espressor-cafenea/index.md): Cum protejezi espressorul si masina de spalat pahare de calcar si ce dozator de apa filtrata se potriveste unui birou.
+- [Programul de Ambasadori Purapa: recomanzi si castigi](https://purapa.ro/blog/program-ambasadori-purapa/index.md): Recomanzi apa filtrata Purapa celor apropiati si primesti comision pentru fiecare achizitie facuta prin codul tau. Fara tinte, fara obligatii.
+
+## Legal
+
+- [Termeni si conditii](https://purapa.ro/termeni-si-conditii/index.md): Termenii si conditiile de utilizare a site-ului Purapa.ro.
+- [Politica de confidentialitate](https://purapa.ro/politica-de-confidentialitate/index.md): Politica de confidentialitate pentru site-ul Purapa.ro, informatii despre prelucrarea datelor personale conform GDPR.
+- [Politica de cookie](https://purapa.ro/politica-de-cookie/index.md): Informatii despre cookie-urile utilizate pe Purapa.ro si modul in care acestea functioneaza.

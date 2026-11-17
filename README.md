@@ -63,15 +63,24 @@ Verificare: https://purapa-six.vercel.app/api/stare trebuie să arate `"blob":"B
 **Indexarea e oprită.** Cât timp purapa.ro e încă site-ul vechi, site-ul nou nu trebuie să apară în Google și nici să concureze cu el:
 
 - antetul `X-Robots-Tag: noindex, nofollow` vine pe orice răspuns, inclusiv imagini și fișiere, din `vercel.json`, iar pentru funcție și pentru serverul local și din aplicație;
-- fiecare pagină are `<meta name="robots" content="noindex, nofollow">` și nu are `canonical`;
+- fiecare pagină are `<meta name="robots" content="noindex, nofollow">`. Are deja `canonical` spre adresa ei de pe purapa.ro, dar cât e „noindex” nu contează;
 - `robots.txt` lasă crawlerele să intre, ca să vadă „noindex”. Un `Disallow: /` ar ascunde „noindex”, iar adresele ar putea fi indexate din linkuri;
-- nu există `sitemap.xml`.
+- `sitemap.xml` există, cu adresele de pe purapa.ro, dar `robots.txt` nu trimite spre el.
+
+**Pregătit pentru căutare și asistenții AI** (pre-launch check, 17.11.2026), totul generat din Brain la fiecare publicare:
+
+- în `<head>`: titlul și descrierea fără diacritice (și în Open Graph / Twitter), titlul cu „| Purapa” doar dacă nu-l conține deja și încape în 60 de caractere, `og:image` în WebP;
+- date structurate într-un singur `@graph`: `Organization` (firma, adresa, programul, rețelele), `WebSite`, pagina (`ContactPage`, `AboutPage`, `CollectionPage`), `BreadcrumbList`, `FAQPage` din întrebările afișate, `ItemList` de `Product` cu oferta de la retailer (fără note), `Blog` și `BlogPosting`;
+- fiecare pagină are versiunea Markdown (`/contact/index.md`, cu `<link rel="alternate" type="text/markdown">`), iar `llms.txt` le listează (`src/site/markdown.mjs`, `src/site/static.mjs`);
+- imaginile JPG/PNG din media au o variantă WebP (`npm run bake:images`), pe care o cer paginile;
+- fiecare pagină are un singur H1: pe paginile fără hero, titlul primei secțiuni.
 
 **În ziua lansării** pe purapa.ro:
 
 1. adaugă `SITE_INDEX=1` în `.env.local`, pentru că paginile statice se generează local, și în Vercel (Settings → Environment Variables, Production);
 2. scoate antetul `x-robots-tag` din `vercel.json`;
-3. repornește `npm start`: paginile se regenerează cu `canonical`, iar `robots.txt` trimite spre `https://purapa.ro/sitemap.xml`, și se publică singure.
+3. repornește `npm start`: paginile se regenerează fără „noindex”, iar `robots.txt` deschide site-ul (și crawlerelor AI: GPTBot, ClaudeBot, PerplexityBot etc.), închide `/manage/` și `/api/` și trimite spre `https://purapa.ro/sitemap.xml`; se publică singure;
+4. trimite sitemap-ul în Google Search Console și Bing Webmaster Tools.
 
 **Adresele:** `purapa.vercel.app` e un proiect al altcuiva. Adresa noastră publică e `purapa-six.vercel.app`, iar `purapa-dwf3.vercel.app` cere login Vercel.
 

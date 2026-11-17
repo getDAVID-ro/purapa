@@ -38,6 +38,15 @@
       ]
     },
     {
+      "source": "/(.*)\\.md",
+      "headers": [
+        {
+          "key": "content-type",
+          "value": "text/markdown; charset=utf-8"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
@@ -51,6 +60,18 @@
         {
           "key": "referrer-policy",
           "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "x-frame-options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "strict-transport-security",
+          "value": "max-age=63072000; includeSubDomains"
+        },
+        {
+          "key": "permissions-policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
         }
       ]
     }
