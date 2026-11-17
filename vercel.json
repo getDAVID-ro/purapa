@@ -12,6 +12,13 @@
       "maxDuration": 60
     }
   },
+  "redirects": [
+    {
+      "source": "/:p((?!api(?:/|$)|manage(?:/|$))[^.]*[^/.])",
+      "destination": "/:p/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
