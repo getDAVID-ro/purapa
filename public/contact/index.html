@@ -6,9 +6,9 @@
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Contact Purapa – filtre de apa si testarea apei"><meta name="twitter:description" content="Ai intrebari despre filtrele de apa sau vrei sa programezi un test? Contacteaza echipa PurApa telefonic, prin email sau formular. Raspuns rapid.">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://purapa.ro/#firma","name":"Purapa","legalName":"Instant Softnet SRL","url":"https://purapa.ro/","logo":"https://purapa.ro/assets/baked/6ba2fb40301790b73d5edb93581deffb84830665-base.webp","email":"contact@purapa.ro","telephone":"+40372887572","taxID":"RO 25383246","address":{"@type":"PostalAddress","streetAddress":"Str. Răsăritului nr. 90, hala C2","addressLocality":"Buftea","addressRegion":"Ilfov","addressCountry":"RO"},"contactPoint":{"@type":"ContactPoint","contactType":"customer service","telephone":"+40372887572","email":"contact@purapa.ro","availableLanguage":"ro","hoursAvailable":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"}},"sameAs":["https://www.facebook.com/profile.php?id=61582186433649","https://www.youtube.com/@PurapaRomania","https://www.tiktok.com/@purapa.romania"]},{"@type":"WebSite","@id":"https://purapa.ro/#site","url":"https://purapa.ro/","name":"Purapa","inLanguage":"ro","publisher":{"@id":"https://purapa.ro/#firma"}},{"@type":"ContactPage","@id":"https://purapa.ro/contact/#pagina","url":"https://purapa.ro/contact/","name":"Contact Purapa – filtre de apă și testarea apei","description":"Ai întrebări despre filtrele de apă sau vrei să programezi un test? Contactează echipa PurApa telefonic, prin email sau formular. Răspuns rapid.","inLanguage":"ro","isPartOf":{"@id":"https://purapa.ro/#site"},"primaryImageOfPage":{"@type":"ImageObject","url":"https://purapa.ro/media/b2e160c5689f618d296184e8faa2f5be92b66db6.webp?v=2026-10-26T09%3A53%3A40.167Z"},"breadcrumb":{"@id":"https://purapa.ro/contact/#firimituri"}},{"@type":"BreadcrumbList","@id":"https://purapa.ro/contact/#firimituri","itemListElement":[{"@type":"ListItem","position":1,"name":"Acasă","item":"https://purapa.ro/"},{"@type":"ListItem","position":2,"name":"Contact","item":"https://purapa.ro/contact/"}]}]}</script><meta name="theme-color" content="#254a99">
 <link rel="preload" href="/assets/fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=b1d13f52a6">
+<link rel="stylesheet" href="/assets/site.css?v=574c5fc2ae">
 <script>document.documentElement.classList.add('fx-js');setTimeout(function(){if(!window.__fx)document.documentElement.classList.add('fx-still')},4000)</script>
-<script src="/assets/site.js?v=b1d13f52a6" defer></script></head>
+<script src="/assets/site.js?v=574c5fc2ae" defer></script></head>
 <body><a class="skip" href="#continut">Sari la conținut</a><div class="fx-progress" aria-hidden="true"></div>
 <header class="site-header"><div class="container bar">
       <a class="logo" href="/" aria-label="Purapa — prima pagină"><img src="/assets/baked/6ba2fb40301790b73d5edb93581deffb84830665-w160.webp" alt="Purapa" width="160" height="104"></a>
@@ -23,14 +23,17 @@
     </ul>
     <div class="contact-form"><h2 data-reveal style="--i:1">Întreabă-ne despre <em class="accent">Purapa</em></h2>
     <form method="post" class="form" data-reveal style="--i:2" toolname="trimite_mesaj_purapa"
-      tooldescription="Trimite un mesaj echipei Purapa (întrebări despre filtre, testarea apei, comenzi sau programul de ambasadori). Cere nume, email, subiect și mesaj; telefonul e opțional. Trimiterea o confirmă vizitatorul." action="mailto:contact@purapa.ro" enctype="text/plain" data-mailto="contact@purapa.ro">
+      tooldescription="Trimite un mesaj echipei Purapa (întrebări despre filtre, testarea apei, comenzi sau programul de ambasadori). Cere nume, email, subiect și mesaj; telefonul e opțional. Trimiterea o confirmă vizitatorul."
+      action="/api/public/contact" data-lead data-mailto="contact@purapa.ro">
       <label>Nume complet <input name="name" required autocomplete="name" toolparamdescription="Numele complet al persoanei care scrie"></label>
       <label>Email <input name="email" type="email" required autocomplete="email" toolparamdescription="Adresa de email la care Purapa răspunde"></label>
       <label>Telefon (opțional) <input name="phone" type="tel" autocomplete="tel" toolparamdescription="Număr de telefon, opțional"></label>
       <label>Subiect <input name="subject" required toolparamdescription="Subiectul mesajului, în câteva cuvinte"></label>
       <label>Mesaj <textarea name="message" minlength="20" required toolparamdescription="Mesajul sau întrebarea, cel puțin 20 de caractere"></textarea></label>
+      <label class="hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off" toolparamdescription="Lasă acest câmp gol"></label>
       <div><button class="btn">Trimite mesajul<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
-      <p class="form-note" role="status" hidden>Mesajul tău s-a deschis în aplicația de email. Apasă „Trimite” acolo și îl primim.</p>
+      <p class="form-note" data-sent role="status" tabindex="-1" hidden>Mulțumim! Am primit mesajul tău și îți răspundem în maximum 1–2 zile lucrătoare.</p>
+      <p class="form-note" data-mail role="status" hidden>Mesajul nu a putut fi trimis direct, așa că s-a deschis în aplicația de email. Apasă „Trimite” acolo și îl primim.</p>
     </form></div></div></div></section></main><footer class="site-footer"><div class="container">
       <div class="cols">
         <div class="about"><a class="logo" href="/" aria-label="Purapa — prima pagină"><img src="/assets/baked/6ba2fb40301790b73d5edb93581deffb84830665-w160.webp" alt="Purapa" width="160" height="104"></a><p>Apă curată și sigură, direct de la robinet. Soluții moderne de filtrare pentru familia ta.</p>

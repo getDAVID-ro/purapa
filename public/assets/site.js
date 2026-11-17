@@ -33,16 +33,31 @@ document.querySelectorAll('form[data-calc]').forEach(form => {
   }));
 });
 
-// Formularul de contact pe site-ul static: nu există server care să primească mesajul, așa că la trimitere se deschide
-// aplicația de email a vizitatorului, cu subiectul și mesajul gata completate.
-document.querySelectorAll('form[data-mailto]:not([data-ambasador])').forEach(form => form.addEventListener('submit', e => {
-  e.preventDefault();
+// Formularul de contact: mesajul pleacă spre Brain (ajunge în panou, la Leads) fără să părăsească pagina. Dacă serverul nu
+// răspunde, se deschide aplicația de email a vizitatorului, cu subiectul și mesajul gata completate, ca mesajul să nu se piardă.
+document.querySelectorAll('form[data-lead]').forEach(form => {
+  const note = k => form.querySelector(`.form-note[data-${k}]`), btn = form.querySelector('button');
   const v = n => form.elements[n]?.value.trim() ?? '';
-  const body = [`Nume: ${v('name')}`, `Email: ${v('email')}`, ...(v('phone') ? [`Telefon: ${v('phone')}`] : []), '', v('message')].join('\n');
-  window.location.href = `mailto:${form.dataset.mailto}?subject=${encodeURIComponent(v('subject'))}&body=${encodeURIComponent(body)}`;
-  const note = form.querySelector('.form-note');
-  if (note) note.hidden = false;
-}));
+  const show = k => { note('sent').hidden = k !== 'sent'; note('mail').hidden = k !== 'mail'; };
+  if (/[?&]trimis=1/.test(location.search)) show('sent');
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    btn.disabled = true;
+    try {
+      const r = await fetch(form.action, {method: 'POST', headers: {'content-type': 'application/json'},
+        body: JSON.stringify(Object.fromEntries(['name', 'email', 'phone', 'subject', 'message', 'website'].map(n => [n, v(n)])))});
+      if (r.status === 400) { alert((await r.json().catch(() => ({}))).error ?? 'Verifică datele completate.'); return; }
+      if (!r.ok) throw new Error(String(r.status));
+      form.reset();
+      show('sent');
+      note('sent').focus({preventScroll: true});
+    } catch {
+      const body = [`Nume: ${v('name')}`, `Email: ${v('email')}`, ...(v('phone') ? [`Telefon: ${v('phone')}`] : []), '', v('message')].join('\n');
+      window.location.href = `mailto:${form.dataset.mailto}?subject=${encodeURIComponent(v('subject'))}&body=${encodeURIComponent(body)}`;
+      show('mail');
+    } finally { btn.disabled = false; }
+  });
+});
 
 // Înscrierea în Purapa Ambassadors. Pe site-ul static (data-mailto) înscrierea se deschide completată în aplicația de email;
 // dacă aplicația nu pornește, vizitatorul o poate copia. Pe serverul local se trimite direct și ajunge în Brain, la mesaje.
