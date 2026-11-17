@@ -1,5 +1,5 @@
 ---
-title: "Produse | Purapa"
+title: "Filtre de apa, cartuse si teste de apa Purapa"
 description: "Descopera gama completa Purapa: filtre de apa pentru bucatarie, cartuse de schimb, sisteme de dedurizare si accesorii premium."
 url: https://purapa.ro/produse/
 lang: ro

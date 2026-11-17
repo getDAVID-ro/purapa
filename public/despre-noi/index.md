@@ -1,5 +1,5 @@
 ---
-title: "Despre Purapa"
+title: "Despre Purapa – apa filtrata pentru casa ta"
 description: "Afla povestea PurApa, tehnologia noastra de filtrare si angajamentul pentru a oferi apa potabila sigura in fiecare casa din Romania."
 url: https://purapa.ro/despre-noi/
 lang: ro

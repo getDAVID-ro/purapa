@@ -1,5 +1,5 @@
 ---
-title: "Termeni si conditii | Purapa"
+title: "Termeni si conditii de utilizare Purapa"
 description: "Termenii si conditiile de utilizare a site-ului Purapa.ro."
 url: https://purapa.ro/termeni-si-conditii/
 lang: ro

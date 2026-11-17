@@ -1,5 +1,5 @@
 ---
-title: "Politica de cookie | Purapa"
+title: "Politica de cookie a site-ului Purapa"
 description: "Informatii despre cookie-urile utilizate pe Purapa.ro si modul in care acestea functioneaza."
 url: https://purapa.ro/politica-de-cookie/
 lang: ro

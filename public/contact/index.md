@@ -1,5 +1,5 @@
 ---
-title: "Contact | Purapa"
+title: "Contact Purapa – filtre de apa si testarea apei"
 description: "Ai intrebari despre filtrele de apa sau vrei sa programezi un test? Contacteaza echipa PurApa telefonic, prin email sau formular. Raspuns rapid."
 url: https://purapa.ro/contact/
 lang: ro

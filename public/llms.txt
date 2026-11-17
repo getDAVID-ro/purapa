@@ -7,11 +7,11 @@ Contact: telefon 0372 887 572, email contact@purapa.ro, program Luni – Vineri:
 ## Pagini
 
 - [Filtre de apa pentru acasa](https://purapa.ro/index.md): Transforma apa de la robinet in apa pura, cristalina si sigura cu sistemele Purapa. Gama completa de filtre, dedurizatoare si teste de apa. Livrare rapida.
-- [Produse](https://purapa.ro/produse/index.md): Descopera gama completa Purapa: filtre de apa pentru bucatarie, cartuse de schimb, sisteme de dedurizare si accesorii premium.
+- [Filtre de apa, cartuse si teste de apa Purapa](https://purapa.ro/produse/index.md): Descopera gama completa Purapa: filtre de apa pentru bucatarie, cartuse de schimb, sisteme de dedurizare si accesorii premium.
 - [Testare apa potabila – analiza rapida cu Test Rapid Purapa](https://purapa.ro/testare-apa/index.md): Testeaza apa acasa, in sub 5 minute: 16 parametri esentiali, raport digital si recomandari personalizate de filtrare.
-- [Despre Purapa](https://purapa.ro/despre-noi/index.md): Afla povestea PurApa, tehnologia noastra de filtrare si angajamentul pentru a oferi apa potabila sigura in fiecare casa din Romania.
+- [Despre Purapa – apa filtrata pentru casa ta](https://purapa.ro/despre-noi/index.md): Afla povestea PurApa, tehnologia noastra de filtrare si angajamentul pentru a oferi apa potabila sigura in fiecare casa din Romania.
 - [Purapa Ambassadors – recomanda apa curata si primesti comision](https://purapa.ro/ambassadors/index.md): Programul Purapa Ambassadors: recomanzi cu naturalete apa filtrata celor apropiati si primesti comision pentru fiecare achizitie. Fara tinte, fara obligatii.
-- [Contact](https://purapa.ro/contact/index.md): Ai intrebari despre filtrele de apa sau vrei sa programezi un test? Contacteaza echipa PurApa telefonic, prin email sau formular. Raspuns rapid.
+- [Contact Purapa – filtre de apa si testarea apei](https://purapa.ro/contact/index.md): Ai intrebari despre filtrele de apa sau vrei sa programezi un test? Contacteaza echipa PurApa telefonic, prin email sau formular. Raspuns rapid.
 - [Trimite testul rapid Purapa – analiza digitala a apei](https://purapa.ro/test-rapid/index.md): Incarca fotografia benzii de testare si primesti pe loc interpretarea celor 16 parametri, plus raportul complet pe email.
 - [Blog Purapa – ghiduri despre apa de acasa](https://purapa.ro/blog/index.md): Ghiduri despre apa de la robinet si din fantana: testare, duritate, clor, filtre si dedurizatoare.
 - [Devino ambasador Purapa – recomanda apa curata](https://purapa.ro/devino-ambasador/index.md): Inscrie-te in Purapa Ambassadors: recomanzi apa curata celor apropiati si primesti comision pentru fiecare achizitie facuta prin codul tau.
@@ -32,6 +32,6 @@ Contact: telefon 0372 887 572, email contact@purapa.ro, program Luni – Vineri:
 
 ## Legal
 
-- [Termeni si conditii](https://purapa.ro/termeni-si-conditii/index.md): Termenii si conditiile de utilizare a site-ului Purapa.ro.
+- [Termeni si conditii de utilizare Purapa](https://purapa.ro/termeni-si-conditii/index.md): Termenii si conditiile de utilizare a site-ului Purapa.ro.
 - [Politica de confidentialitate](https://purapa.ro/politica-de-confidentialitate/index.md): Politica de confidentialitate pentru site-ul Purapa.ro, informatii despre prelucrarea datelor personale conform GDPR.
-- [Politica de cookie](https://purapa.ro/politica-de-cookie/index.md): Informatii despre cookie-urile utilizate pe Purapa.ro si modul in care acestea functioneaza.
+- [Politica de cookie a site-ului Purapa](https://purapa.ro/politica-de-cookie/index.md): Informatii despre cookie-urile utilizate pe Purapa.ro si modul in care acestea functioneaza.
