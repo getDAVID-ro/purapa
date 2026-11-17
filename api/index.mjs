@@ -9,10 +9,12 @@ import {mkdir, writeFile, readFile, rm} from 'node:fs/promises';
 import {join, extname} from 'node:path';
 import {createApp} from '../src/app.mjs';
 import {stareBlob} from '../src/core/stare.mjs';
+import {createWaterTests, testsPublicRoute} from '../src/core/watertests.mjs';
 
 const TMP = '/tmp/purapa', DB = join(TMP, 'purapa.db');
 const CHECK_MS = 30e3;
 let app = null, version = null, checkedAt = 0, remote = null;
+const tests = createWaterTests();
 
 // Adresele publice care n-au fișier static: fără bara finală → 301 spre varianta cu bară; altfel pagina 404.
 async function publicFallback(path, res) {
@@ -47,7 +49,7 @@ async function load() {
   for (const f of ['', '-wal', '-shm']) await rm(DB + f, {force: true});
   await writeFile(DB, buf);
   version = r.version;
-  app = createApp({file: DB, mediaDir: join(process.cwd(), 'public', 'media')});
+  app = createApp({file: DB, mediaDir: join(process.cwd(), 'public', 'media'), tests});
   app.db.exec('PRAGMA journal_mode = DELETE'); // un singur fișier, gata de urcat
 }
 
@@ -61,9 +63,12 @@ export default async function purapa(req, res) {
     res.writeHead(200, {'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store'});
     return res.end(JSON.stringify(stareBlob()));
   }
+  // Testele de apă trimise de pe /test-rapid/ merg direct în tabelul lor din Neon, fără baza panoului.
+  if (path.startsWith('/api/teste') && await testsPublicRoute(tests, req, res, path)) return;
   if (path !== '/manage' && !path.startsWith('/manage/') && !path.startsWith('/api/')) return publicFallback(path, res);
 
-  const writes = !['GET', 'HEAD', 'OPTIONS'].includes(req.method);
+  // Acțiunile din „Teste apă” (stare, ștergere) scriu în Neon, nu în baza panoului: nu se urcă baza după ele.
+  const writes = !['GET', 'HEAD', 'OPTIONS'].includes(req.method) && !path.startsWith('/manage/teste/');
   try {
     if (!app || writes || Date.now() - checkedAt > CHECK_MS) {
       await load();

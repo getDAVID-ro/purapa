@@ -22,6 +22,7 @@ export const impact = i => `<span class="badge ${i === 'mare' ? 'bad' : i === 'm
 const NAV = [
   ['panou', '/manage/', 'Panou', 'content.read'],
   ['leads', '/manage/leads/', 'Leads', 'content.read'],
+  ['teste', '/manage/teste/', 'Teste apă', 'content.read'],
   ['entitati', '/manage/entitati/', 'Entități', 'content.read'],
   ['harta', '/manage/harta/', 'Harta', 'content.read'],
   ['legaturi', '/manage/surse/legaturi/', 'Legături de verificat', 'content.read'],

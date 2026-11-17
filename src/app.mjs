@@ -4,13 +4,15 @@ import {join, normalize, extname, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {timingSafeEqual} from 'node:crypto';
 import {openDb, migrate} from './core/db.mjs';
-import {createStore, HttpError, SYSTEM} from './core/store.mjs';
+import {createStore, HttpError, SYSTEM, can} from './core/store.mjs';
 import {createSync} from './core/sync.mjs';
 import {createGraph} from './core/graph.mjs';
 import {createTodos} from './core/todos.mjs';
 import {createAuth, isLocal} from './auth/auth.mjs';
 import {createApi} from './manage/api.mjs';
-import {renderManage} from './manage/pages.mjs';
+import {renderManage, manageCounts} from './manage/pages.mjs';
+import {testsList, testView} from './manage/views/tests.mjs';
+import {createWaterTests, testsPublicRoute, TestError} from './core/watertests.mjs';
 import {login as loginPage} from './manage/views/users.mjs';
 import {createContext} from './site/context.mjs';
 import {renderPath, publicPaths, indexable, robotsTxt} from './site/render.mjs';
@@ -21,7 +23,9 @@ const MIME = {'.woff2': 'font/woff2','.jpg': 'image/jpeg', '.jpeg': 'image/jpeg'
   '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8'};
 
 // `syncStatus()`: starea sincronizării cu baza online (serverul local), afișată în panou la un conflict.
-export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cronKey = process.env.CRON_KEY, syncStatus = () => null} = {}) {
+// `tests`: testele de apă din formularul /test-rapid/, ținute în Neon (src/core/watertests.mjs).
+export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cronKey = process.env.CRON_KEY, syncStatus = () => null,
+  tests = createWaterTests()} = {}) {
   const db = openDb(file);
   migrate(db);
   const store = createStore(db);
@@ -71,6 +75,36 @@ export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cro
     return null;
   }
 
+  // Teste apă în panou: lista, fișa, fotografia și acțiunile (stare, ștergere). Datele sunt în Neon, deci totul e asincron.
+  async function testsManage(req, res, path, user, headers) {
+    if (!can(user, 'content.read')) throw new HttpError(403, 'Lipsește dreptul content.read');
+    const ctx = {...env, user, counts: manageCounts(env)};
+    const m = /^\/manage\/teste\/(?:(\d+)\/(?:(imagine|stare|sterge)\/)?)?$/.exec(path);
+    if (!m) throw new HttpError(404, 'Pagina nu există');
+    const [, id, action] = m;
+    try {
+      if (req.method === 'POST') {
+        if (!id || !['stare', 'sterge'].includes(action)) throw new HttpError(405, 'Metodă nepermisă');
+        if (!can(user, 'content.write')) throw new HttpError(403, 'Lipsește dreptul content.write');
+        const b = await readBody(req);
+        return send(res, 200, action === 'stare' ? await tests.setStatus(id, b.status) : await tests.remove(id), undefined, headers);
+      }
+      if (!id) return send(res, 200, testsList(ctx, tests.available() ? await tests.list() : [], {available: tests.available()}), 'text/html; charset=utf-8', headers);
+      if (action === 'imagine') {
+        const img = await tests.image(id);
+        if (!img) throw new HttpError(404, 'Fără fotografie');
+        return send(res, 200, img.data, img.type, {...headers, 'cache-control': 'private, max-age=3600', 'x-content-type-options': 'nosniff'});
+      }
+      if (action) throw new HttpError(405, 'Metodă nepermisă');
+      const t = await tests.get(id);
+      if (!t) throw new HttpError(404, 'Testul nu există');
+      return send(res, 200, testView(ctx, t), 'text/html; charset=utf-8', headers);
+    } catch (e) {
+      if (e instanceof TestError) throw new HttpError(e.status, e.message);
+      throw e;
+    }
+  }
+
   async function handle(req, res) {
     const url = new URL(req.url, 'http://local');
     const path = decodeURIComponent(url.pathname);
@@ -78,6 +112,8 @@ export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cro
       // Scrierile venite din alt site sunt refuzate (verificarea Origin).
       if (req.method !== 'GET' && req.method !== 'HEAD' && (path.startsWith('/api/manage/') || path.startsWith('/manage/'))
         && req.headers.origin && new URL(req.headers.origin).host !== req.headers.host) throw new HttpError(403, 'Origine nepermisă');
+
+      if (path.startsWith('/api/teste') && await testsPublicRoute(tests, req, res, path)) return;
 
       if (path.startsWith('/api/manage/auth/') && req.method === 'POST') {
         const handled = await authRoute(req, res, path);
@@ -128,6 +164,7 @@ export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cro
           const out = renderPath(createContext(store, {preview: true}), store, target);
           return send(res, out.status, out.html, 'text/html; charset=utf-8', headers);
         }
+        if (path.startsWith('/manage/teste/')) return await testsManage(req, res, path, user, headers);
         return send(res, 200, renderManage(env, path, user), 'text/html; charset=utf-8', headers);
       }
 

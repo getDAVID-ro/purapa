@@ -7,13 +7,16 @@ import {inferred, sources, map} from './views/review.mjs';
 import {users} from './views/users.mjs';
 import {byKey} from '../registry/entities.mjs';
 
+// Numerele din meniu (propagări eșuate, legături de verificat, leads noi), folosite și de paginile asincrone (Teste apă).
+export const manageCounts = env => ({
+  failed: env.db.prepare("SELECT COUNT(*) n FROM change_events WHERE status = 'failed'").get().n,
+  inferred: inferredCount(env.db),
+  leads: env.db.prepare('SELECT COUNT(*) n FROM messages WHERE created_at >= ?').get(new Date(Date.now() - 7 * 864e5).toISOString()).n,
+  syncConflict: env.syncStatus?.() ?? null
+});
+
 export function renderManage(env, path, user) {
-  const ctx = {...env, user, counts: {
-    failed: env.db.prepare("SELECT COUNT(*) n FROM change_events WHERE status = 'failed'").get().n,
-    inferred: inferredCount(env.db),
-    leads: env.db.prepare('SELECT COUNT(*) n FROM messages WHERE created_at >= ?').get(new Date(Date.now() - 7 * 864e5).toISOString()).n,
-    syncConflict: env.syncStatus?.() ?? null
-  }};
+  const ctx = {...env, user, counts: manageCounts(env)};
   if (!can(user, 'content.read')) throw new HttpError(403, 'Lipsește dreptul content.read');
   let m;
   if (path === '/manage/') return dashboard(ctx);
