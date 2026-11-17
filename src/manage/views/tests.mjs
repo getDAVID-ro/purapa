@@ -39,6 +39,14 @@ ${rows.map(r => `<tr${r.status === 'inchis' ? ' class="muted"' : ''}><td class="
   return page(ctx.user, {title: 'Teste apă', active: 'teste', crumbs: [['Teste apă']], body, counts: ctx.counts});
 }
 
+// Cât panoul e deschis fără parolă, testele (date personale) nu se arată.
+export function testsLocked(ctx) {
+  const body = `<div class="head"><h1>Teste apă</h1></div>
+<div class="flash bad">Testele de apă conțin date personale (nume, email, telefon, fotografii), așa că nu se arată cât panoul e deschis oricui, fără parolă.</div>
+<p>Ca să le vezi online: creează conturi în <a href="/manage/utilizatori/">Utilizatori</a>, apoi scoate variabila <code>MANAGE_OPEN</code> din proiectul Vercel (Settings → Environment Variables) și republică. Local, cu <code>npm start</code>, se văd după autentificare.</p>`;
+  return page(ctx.user, {title: 'Teste apă', active: 'teste', crumbs: [['Teste apă']], body, counts: ctx.counts});
+}
+
 export function testView(ctx, t) {
   const result = typeof t.result === 'string' ? JSON.parse(t.result) : t.result;
   const params = interpret(result);

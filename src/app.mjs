@@ -11,7 +11,7 @@ import {createTodos} from './core/todos.mjs';
 import {createAuth, isLocal} from './auth/auth.mjs';
 import {createApi} from './manage/api.mjs';
 import {renderManage, manageCounts} from './manage/pages.mjs';
-import {testsList, testView} from './manage/views/tests.mjs';
+import {testsList, testView, testsLocked} from './manage/views/tests.mjs';
 import {createWaterTests, testsPublicRoute, TestError} from './core/watertests.mjs';
 import {login as loginPage} from './manage/views/users.mjs';
 import {createContext} from './site/context.mjs';
@@ -79,6 +79,11 @@ export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cro
   async function testsManage(req, res, path, user, headers) {
     if (!can(user, 'content.read')) throw new HttpError(403, 'Lipsește dreptul content.read');
     const ctx = {...env, user, counts: manageCounts(env)};
+    // Datele personale (nume, email, telefon, fotografii) nu se arată cât panoul e deschis oricui (MANAGE_OPEN=1).
+    if (user.open) {
+      if (req.method !== 'GET') throw new HttpError(403, 'Testele de apă cer autentificare.');
+      return send(res, 403, testsLocked(ctx), 'text/html; charset=utf-8', headers);
+    }
     const m = /^\/manage\/teste\/(?:(\d+)\/(?:(imagine|stare|sterge)\/)?)?$/.exec(path);
     if (!m) throw new HttpError(404, 'Pagina nu există');
     const [, id, action] = m;
