@@ -25,7 +25,8 @@
     "media:upload": "node scripts/db.mjs media:upload",
     "transfer:pack": "node scripts/transfer.mjs pack",
     "transfer:setup": "node scripts/transfer.mjs setup",
-    "blob:copy": "node scripts/blob-copy.mjs"
+    "blob:copy": "node scripts/blob-copy.mjs",
+    "media:host": "node scripts/host-media.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "1.2.0",

@@ -1,7 +1,7 @@
 // Aduce pe site imaginile din media care stau pe alt server (de exemplu Unsplash): le descarcă în WebP, sub 200 KB,
 // în data/media/<sha1>.webp, și schimbă înregistrarea din Brain (același ID, deci paginile care le folosesc se refac singure).
 // Se poate rula de mai multe ori: imaginile deja găzduite sunt sărite. Rulează-l cu serverul local oprit.
-//   node scripts/host-media.mjs          baza data/purapa.db
+//   npm run media:host                   baza data/purapa.db
 //   DB=altă.db node scripts/host-media.mjs
 import {createHash} from 'node:crypto';
 import {writeFileSync, mkdirSync} from 'node:fs';

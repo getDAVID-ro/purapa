@@ -72,7 +72,7 @@ Verificare: https://purapa-six.vercel.app/api/stare trebuie să arate `"blob":"B
 - în `<head>`: titlul și descrierea fără diacritice (și în Open Graph / Twitter), titlul cu „| Purapa” doar dacă nu-l conține deja și încape în 60 de caractere, `og:image` în WebP;
 - date structurate într-un singur `@graph`: `Organization` (firma, adresa, programul, rețelele), `WebSite`, pagina (`ContactPage`, `AboutPage`, `CollectionPage`), `BreadcrumbList`, `FAQPage` din întrebările afișate, `ItemList` de `Product` cu oferta de la retailer (fără note), `Blog` și `BlogPosting`;
 - fiecare pagină are versiunea Markdown (`/contact/index.md`, cu `<link rel="alternate" type="text/markdown">`), iar `llms.txt` le listează (`src/site/markdown.mjs`, `src/site/static.mjs`);
-- imaginile JPG/PNG din media au o variantă WebP (`npm run bake:images`), pe care o cer paginile;
+- imaginile JPG/PNG din media au o variantă WebP (`npm run bake:images`), pe care o cer paginile; imaginile luate de pe alt server (de ex. Unsplash) se aduc pe site, în WebP sub 200 KB, cu `npm run media:host`;
 - fiecare pagină are un singur H1: pe paginile fără hero, titlul primei secțiuni.
 
 **În ziua lansării** pe purapa.ro:
