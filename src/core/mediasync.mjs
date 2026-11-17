@@ -1,4 +1,4 @@
-// Imaginile din data/media, păstrate și în Vercel Blob (privat, media/<nume>), ca proiectul să poată fi refăcut
+// Imaginile din data/media, păstrate și în Vercel Blob (public, media/<nume>), ca proiectul să poată fi refăcut
 // pe alt calculator sau la alt proprietar (npm run setup). Blob-ul ține doar imagini, deci cota lui nu mai blochează panoul.
 // Lista celor urcate stă în Neon (brain_media), ca să nu listăm Blob-ul: o verificare costă o interogare Neon,
 // iar în Blob se fac operații doar pentru imaginile noi.
@@ -11,7 +11,7 @@ const type = name => TYPES[name.slice(name.lastIndexOf('.')).toLowerCase()] ?? '
 const exists = p => access(p).then(() => true, () => false);
 
 export function createMediaSync({remote, dir = 'data/media', token = process.env.BLOB_READ_WRITE_TOKEN, log = console.log} = {}) {
-  const opts = {access: 'private', token};
+  const opts = {access: 'public', token};
 
   // Urcă imaginile locale care nu sunt încă în Blob.
   async function upload() {

@@ -8,6 +8,7 @@ import {createRemote, ConflictError} from '../src/core/remote.mjs';
 import {mkdir, writeFile, readFile, rm} from 'node:fs/promises';
 import {join, extname} from 'node:path';
 import {createApp} from '../src/app.mjs';
+import {stareBlob} from '../src/core/stare.mjs';
 
 const TMP = '/tmp/purapa', DB = join(TMP, 'purapa.db');
 const CHECK_MS = 30e3;
@@ -56,6 +57,10 @@ async function persist() {
 
 export default async function purapa(req, res) {
   const path = decodeURIComponent(new URL(req.url, 'http://local').pathname);
+  if (path === '/api/stare') {
+    res.writeHead(200, {'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store'});
+    return res.end(JSON.stringify(stareBlob()));
+  }
   if (path !== '/manage' && !path.startsWith('/manage/') && !path.startsWith('/api/')) return publicFallback(path, res);
 
   const writes = !['GET', 'HEAD', 'OPTIONS'].includes(req.method);

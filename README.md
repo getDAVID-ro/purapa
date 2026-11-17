@@ -37,7 +37,7 @@ Site-ul e pe **https://purapa-six.vercel.app**, iar panoul online la [`/manage/`
 
 Lucrezi local (conținut, cod, design), iar restul se face singur:
 
-- **Codul și designul** se comit și se urcă pe GitHub (`toma776/purapa`) după fiecare modificare. Vercel publică automat fiecare push pe `main`.
+- **Codul și designul** se comit și se urcă pe GitHub (`getDAVID-ro/purapa`) după fiecare modificare. Vercel publică automat fiecare push pe `main`.
 - **Conținutul:** cât rulează `npm start`, orice schimbare din panoul local regenerează paginile din `public/`. După 15 secunde fără alte schimbări, serverul le comite („Conținut publicat din panou”) și le urcă pe GitHub, iar Vercel le publică în aproximativ 40 de secunde (`src/core/publisher.mjs`). Un push eșuat se reîncearcă singur; `PUBLISH=0` oprește publicarea.
 - **Panoul online** se sincronizează cu baza locală prin Neon, la 15 minute (`SYNC_SECONDS`):
   - ce modifici local ajunge în panoul online;
@@ -48,6 +48,17 @@ Lucrezi local (conținut, cod, design), iar restul se face singur:
 Cheile (`DATABASE_URL` pentru Neon, `BLOB_READ_WRITE_TOKEN`) vin local cu `npx vercel env pull .env.local` (fișierul nu intră în git). Fără ele, baza rămâne doar locală, iar site-ul se publică oricum.
 
 **Transferul** la alt proprietar (GitHub, Vercel, Neon, Blob) e descris în [TRANSFER.md](TRANSFER.md).
+
+## Mutarea imaginilor în Blob-ul vostru
+
+După transferul proiectului Vercel `purapa`, baza Neon vine odată cu proiectul, dar imaginile trebuie puse în Blob-ul vostru:
+
+1. În proiectul de pe Vercel: Storage → Create → Blob, public, Frankfurt, legat de proiect. Dacă proiectul are deja variabila `BLOB_READ_WRITE_TOKEN`, ștergeți-o întâi: e de la depozitul DWF.
+2. Cu Node 24 sau mai nou: `git clone https://github.com/getDAVID-ro/purapa.git`, apoi `cd purapa`, apoi `npm install`, apoi `npx vercel link` (alegeți proiectul `purapa`), apoi `npx vercel env pull .env.local`, apoi `npm run blob:copy`. Copierea durează un minut și la final confirmă fiecare fișier.
+3. În Settings → Environment Variables ștergeți `DWF_BLOB_TOKEN`, apoi faceți Redeploy.
+4. Rulați încă o dată `npm run blob:copy`, ca să prindă ce s-a încărcat între timp.
+
+Verificare: https://purapa-six.vercel.app/api/stare trebuie să arate `"blob":"BLOB_READ_WRITE_TOKEN"` și `"neon":true`. Ce face DWF înainte și după: [TRANSFER.md](TRANSFER.md).
 
 **Indexarea e oprită.** Cât timp purapa.ro e încă site-ul vechi, site-ul nou nu trebuie să apară în Google și nici să concureze cu el:
 

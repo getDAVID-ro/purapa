@@ -6,7 +6,7 @@
 //
 //   npm run transfer:setup -- --from-db "<DATABASE_URL vechi>" [--from-blob "<BLOB_READ_WRITE_TOKEN vechi>"] [--accept-neon-terms]
 //     la noul proprietar, după ce proiectul Vercel e la el și e legat (npx vercel link):
-//     creează în echipa lui Neon (purapa-db) și Blob (purapa-media), aduce cheile în .env.local, copiază baza și imaginile
+//     creează în echipa lui Neon (purapa-db) și Blob public (purapa-media), aduce cheile în .env.local, copiază baza și imaginile
 //     din resursele noastre, refăcând și copia locală, apoi republică și verifică panoul online.
 //     Neon cere acceptarea termenilor: --accept-neon-terms se pune doar după ce omul a spus explicit „da”.
 import {spawnSync} from 'node:child_process';
@@ -85,8 +85,8 @@ Le ștergem după ce noul proprietar confirmă că totul merge.
   } else console.log('  DATABASE_URL există deja: Neon e creat.');
 
   if (!names.has('BLOB_READ_WRITE_TOKEN')) {
-    step('Creez Blob-ul pentru imagini (purapa-media, privat, Frankfurt)');
-    vercel(['blob', 'create-store', 'purapa-media', '--access', 'private', '--region', 'fra1', '--yes']);
+    step('Creez Blob-ul pentru imagini (purapa-media, public, Frankfurt)');
+    vercel(['blob', 'create-store', 'purapa-media', '--access', 'public', '--region', 'fra1', '--yes']);
   } else console.log('  BLOB_READ_WRITE_TOKEN există deja: Blob-ul e creat.');
 
   step('Aduc cheile în .env.local');
