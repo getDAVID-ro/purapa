@@ -59,8 +59,8 @@ document.querySelectorAll('form[data-lead]').forEach(form => {
   });
 });
 
-// Înscrierea în Purapa Ambassadors. Pe site-ul static (data-mailto) înscrierea se deschide completată în aplicația de email;
-// dacă aplicația nu pornește, vizitatorul o poate copia. Pe serverul local se trimite direct și ajunge în Brain, la mesaje.
+// Înscrierea în Purapa Ambassadors: pleacă direct spre Brain și apare în panou, la Leads. Dacă serverul nu răspunde, se deschide
+// completată în aplicația de email a vizitatorului (data-mailto); dacă nici aplicația nu pornește, o poate copia.
 document.querySelectorAll('form[data-ambasador]').forEach(form => {
   const box = form.nextElementSibling, phone = form.elements.phone;
   const v = n => form.elements[n]?.value?.trim?.() ?? '';
@@ -83,22 +83,23 @@ document.querySelectorAll('form[data-ambasador]').forEach(form => {
     phone.setCustomValidity(phoneOk() ? '' : 'Scrie un număr de telefon valid, de exemplu 0722 123 456.');
     if (!form.reportValidity()) return;
     const data = {name: v('name'), email: v('email'), phone: v('phone'), city: v('city'), profile: picked('profile')[0] ?? '',
-      channels: picked('channels'), link: v('link'), motivation: v('motivation'), gdpr: form.elements.gdpr.checked};
+      channels: picked('channels'), link: v('link'), motivation: v('motivation'), gdpr: form.elements.gdpr.checked, website: v('website')};
     text = ['Înscriere în programul Purapa Ambassadors', '', `Nume: ${data.name}`, `Email: ${data.email}`, `Telefon: ${data.phone}`,
       `Oraș: ${data.city}`, `Ce mă descrie: ${data.profile}`, `Unde aș recomanda Purapa: ${data.channels.join(', ') || '—'}`,
       `Profil online: ${data.link || '—'}`, '', `De ce mă atrage programul: ${data.motivation || '—'}`, '',
       'Sunt de acord cu prelucrarea datelor conform Politicii de confidențialitate.'].join('\n');
-    if (form.dataset.mailto) {
-      window.location.href = `mailto:${form.dataset.mailto}?subject=${encodeURIComponent(`Înscriere Purapa Ambassadors: ${data.name}`)}&body=${encodeURIComponent(text)}`;
-      return done(false);
-    }
     const btn = form.querySelector('button[type=submit]');
     btn.disabled = true;
     try {
       const r = await fetch(form.action, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(data)});
-      if (!r.ok) throw new Error(await r.text());
+      if (r.status === 400) { alert((await r.json().catch(() => ({}))).error ?? 'Verifică datele completate.'); return; }
+      if (!r.ok) throw new Error(String(r.status));
       done(true);
-    } catch { btn.disabled = false; alert('Înscrierea nu a putut fi trimisă. Încearcă din nou sau scrie-ne pe email.'); }
+    } catch {
+      if (!form.dataset.mailto) { alert('Înscrierea nu a putut fi trimisă. Încearcă din nou sau scrie-ne pe email.'); return; }
+      window.location.href = `mailto:${form.dataset.mailto}?subject=${encodeURIComponent(`Înscriere Purapa Ambassadors: ${data.name}`)}&body=${encodeURIComponent(text)}`;
+      done(false);
+    } finally { btn.disabled = false; }
   });
   box.querySelector('[data-copy]')?.addEventListener('click', async ev => {
     const b = ev.currentTarget;
