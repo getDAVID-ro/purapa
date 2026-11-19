@@ -187,17 +187,20 @@ export function createApp({file = 'data/purapa.db', mediaDir = 'data/media', cro
         return done();
       }
 
-      // Înscrierea în Purapa Ambassadors (doar pe serverul local; pe site-ul static pleacă prin email): devine un mesaj în Brain.
+      // Înscrierea în Purapa Ambassadors: devine un lead în Brain (/manage/leads/), ca mesajele de contact, cu același câmp-capcană.
       if (path === '/api/public/ambasador' && req.method === 'POST') {
         const b = await readBody(req);
-        const list = v => (Array.isArray(v) ? v : [v]).filter(Boolean).join(', ');
-        if (!b.name || !b.email || !b.phone || !b.gdpr) throw new HttpError(400, 'Completează numele, emailul, telefonul și acordul');
-        const message = [`Oraș: ${b.city ?? ''}`, `Profil: ${b.profile ?? ''}`, `Unde ar recomanda: ${list(b.channels) || '—'}`,
-          `Profil online: ${b.link || '—'}`, '', b.motivation || '(fără mesaj)'].join('\n');
-        store.create({...SYSTEM, name: 'Formular ambasadori'}, 'cereri', {name: b.name, email: b.email, phone: b.phone,
+        const done = () => (req.headers['content-type'] ?? '').includes('application/json') ? send(res, 200, {ok: true})
+          : send(res, 303, '', 'text/plain', {location: '/devino-ambasador/?trimis=1#inscriere'});
+        if (b.website) return done();
+        const t = (v, max) => String(v ?? '').trim().slice(0, max);
+        const list = v => (Array.isArray(v) ? v : [v]).filter(Boolean).map(x => t(x, 60)).slice(0, 12).join(', ');
+        if (!t(b.name, 120) || !t(b.email, 200) || !t(b.phone, 40) || !b.gdpr) throw new HttpError(400, 'Completează numele, emailul, telefonul și acordul');
+        const message = [`Oraș: ${t(b.city, 120)}`, `Profil: ${t(b.profile, 80)}`, `Unde ar recomanda: ${list(b.channels) || '—'}`,
+          `Profil online: ${t(b.link, 300) || '—'}`, '', t(b.motivation, 3000) || '(fără mesaj)'].join('\n');
+        store.create({...SYSTEM, name: 'Formular ambasadori'}, 'cereri', {name: t(b.name, 120), email: t(b.email, 200), phone: t(b.phone, 40),
           subject: 'Înscriere Purapa Ambassadors', message, source: 'Formular ambasadori'});
-        if ((req.headers['content-type'] ?? '').includes('application/json')) return send(res, 200, {ok: true});
-        return send(res, 303, '', 'text/plain', {location: '/devino-ambasador/?trimis=1#inscriere'});
+        return done();
       }
 
       if (path.startsWith('/media/')) {

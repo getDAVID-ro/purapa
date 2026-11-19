@@ -183,7 +183,19 @@ test('leads: formularul de contact scrie în Brain, iar panoul le arată la /man
 
   const cookie = (await fetch(`${base}/api/manage/auth/login`, {method: 'POST', headers: {'content-type': 'application/json'},
     body: JSON.stringify({email: 'admin@test.ro', password: 'parola-admin-1'})})).headers.get('set-cookie').split(';')[0];
+  // Înscrierea de ambasador ajunge tot în Leads; câmpul-capcană și lipsa acordului o opresc.
+  const amb = body => fetch(`${base}/api/public/ambasador`, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(body)});
+  const signup = {name: 'Radu Ene', email: 'radu@test.ro', phone: '0733 111 222', city: 'Iași', profile: 'Student', channels: ['Instagram', 'Colegi'], gdpr: true};
+  assert.deepEqual(await (await amb(signup)).json(), {ok: true});
+  assert.equal((await amb({...signup, website: 'x'})).status, 200);
+  assert.equal((await amb({...signup, gdpr: false})).status, 400);
+  const radu = app.store.list('cereri').filter(r => r.email === 'radu@test.ro');
+  assert.equal(radu.length, 1);
+  assert.equal(radu[0].source, 'Formular ambasadori');
+  assert.match(radu[0].message, /Oraș: Iași[\s\S]*Instagram, Colegi/);
+
   const html = await (await fetch(`${base}/manage/leads/`, {headers: {cookie}})).text();
+  assert.match(html, /Radu Ene/);
   assert.match(html, /Ioana Pop/);
   assert.match(html, /mailto:ioana@test\.ro/);
   assert.match(html, /Filtru pentru apartament/);

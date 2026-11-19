@@ -553,8 +553,8 @@ const SECTIONS = {
       </div>
       <div class="amb-card" id="inscriere">
         <form method="post" class="form amb-form" data-ambasador toolname="inscriere_ambasador_purapa"
-          tooldescription="Trimite o cerere de înscriere în programul Purapa Ambassadors: nume, email, telefon, oraș, profil și unde ar recomanda Purapa. Acordul pentru prelucrarea datelor și trimiterea le confirmă vizitatorul." ${ctx.staticSite
-          ? `action="mailto:${mail}" enctype="text/plain" data-mailto="${mail}"` : 'action="/api/public/ambasador"'}>
+          tooldescription="Trimite o cerere de înscriere în programul Purapa Ambassadors: nume, email, telefon, oraș, profil și unde ar recomanda Purapa. Acordul pentru prelucrarea datelor și trimiterea le confirmă vizitatorul."
+          action="/api/public/ambasador" data-mailto="${mail}">
           <div class="amb-form-head"><h2>Înscrie-te în program</h2><p>Durează două minute și nu te obligă la nimic.</p></div>
           ${input('name', 'Nume complet', 'autocomplete="name" placeholder="ex: Andreea Popescu" toolparamdescription="Numele complet al persoanei care se înscrie"')}
           <div class="amb-row">
@@ -568,6 +568,7 @@ const SECTIONS = {
           <label><span>De ce te atrage programul? <small>(opțional)</small></span><textarea name="motivation" rows="3" placeholder="Câteva cuvinte despre tine și despre cum ai recomanda Purapa" toolparamdescription="De ce îl atrage programul, opțional"></textarea></label>
           <label class="tr-check"><input type="checkbox" name="gdpr" required><i>${check}</i><span>Sunt de acord cu prelucrarea datelor conform ${privacyHref
             ? `<a href="${esc(privacyHref)}" target="_blank">Politicii de confidențialitate</a>` : 'Politicii de confidențialitate'}. ${req}</span></label>
+          <label class="hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off" toolparamdescription="Lasă acest câmp gol"></label>
           <div class="amb-submit"><button class="btn" type="submit">Vreau să devin ambasador${icon('arrow')}</button>
             ${s.note ? `<p>${ctx.text(s.note)}</p>` : ''}</div>
         </form>
